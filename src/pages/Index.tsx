@@ -11,7 +11,7 @@ import { ptBR } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
 import jsPDF from 'jspdf';
 import * as XLSX from 'xlsx';
-import { Document, Packer, Paragraph, Table, TableCell, TableRow, WidthType, AlignmentType, HeadingLevel, BorderStyle } from 'docx';
+import { Document, Packer, Paragraph, Table, TableCell, TableRow, WidthType, AlignmentType, HeadingLevel, BorderStyle, TextRun } from 'docx';
 
 interface Item {
   id: string;
@@ -109,6 +109,11 @@ const Index = () => {
   const exportToPDF = () => {
     const doc = new jsPDF();
     
+    // Configurações de cores
+    const primaryColor = [41, 128, 185]; // Azul elegante
+    const grayColor = [128, 128, 128];
+    const darkGray = [64, 64, 64];
+    
     // Função para converter imagem para base64
     const addImageToPDF = (imageSrc: string) => {
       return new Promise((resolve) => {
@@ -130,105 +135,179 @@ const Index = () => {
       });
     };
 
-    // Adicionar logo
+    // Adicionar logo e cabeçalho
     addImageToPDF('/lovable-uploads/007f16c7-9a20-4239-954a-386da9c3b0b4.png').then((logoBase64: any) => {
+      // Adicionar linha decorativa no topo
+      doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+      doc.rect(0, 0, 210, 8, 'F');
+      
       if (logoBase64) {
-        doc.addImage(logoBase64, 'PNG', 15, 10, 20, 20);
+        doc.addImage(logoBase64, 'PNG', 15, 15, 25, 25);
       }
       
-      // Cabeçalho
-      doc.setFontSize(16);
+      // Cabeçalho com melhor formatação
+      doc.setFontSize(18);
       doc.setFont("helvetica", "bold");
-      doc.text("PREFEITURA MUNICIPAL DE INAJÁ", 105, 20, { align: "center" });
+      doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+      doc.text("PREFEITURA MUNICIPAL DE INAJÁ", 105, 25, { align: "center" });
       
-      doc.setFontSize(12);
+      doc.setFontSize(11);
       doc.setFont("helvetica", "normal");
-      doc.text("Av. Antônio Veiga Martins, 80 - CEP: 87670-000", 105, 30, { align: "center" });
-      doc.text("Telefone: (44) 3112-4320", 105, 37, { align: "center" });
-      doc.text("E-mail: prefeito@inaja.pr.gov.br", 105, 44, { align: "center" });
+      doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
+      doc.text("Av. Antônio Veiga Martins, 80 - CEP: 87670-000", 105, 35, { align: "center" });
+      doc.text("Telefone: (44) 3112-4320 | E-mail: prefeito@inaja.pr.gov.br", 105, 42, { align: "center" });
       
-      // Título do documento
+      // Linha separadora
+      doc.setDrawColor(grayColor[0], grayColor[1], grayColor[2]);
+      doc.setLineWidth(0.5);
+      doc.line(20, 50, 190, 50);
+      
+      // Título do documento com caixa destacada
+      doc.setFillColor(245, 245, 245);
+      doc.rect(20, 58, 170, 12, 'F');
+      doc.setDrawColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+      doc.setLineWidth(1);
+      doc.rect(20, 58, 170, 12, 'S');
+      
       doc.setFontSize(14);
       doc.setFont("helvetica", "bold");
-      doc.text("SOLICITAÇÃO DE FORNECIMENTO", 105, 60, { align: "center" });
+      doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+      doc.text("SOLICITAÇÃO DE FORNECIMENTO", 105, 66, { align: "center" });
       
-      // Dados do formulário
+      // Dados do formulário em caixas organizadas
       doc.setFontSize(10);
       doc.setFont("helvetica", "normal");
-      doc.text(`Solicitante: ${formData.nomeSolicitante}`, 20, 80);
-      doc.text(`Empresa: ${formData.nomeEmpresa}`, 20, 87);
-      doc.text(`Data: ${formData.dataSolicitacao}`, 20, 94);
+      doc.setTextColor(0, 0, 0);
       
-      // Tabela de itens com bordas
-      let yPosition = 110;
+      // Caixa de informações
+      doc.setFillColor(250, 250, 250);
+      doc.rect(20, 80, 170, 25, 'F');
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.5);
+      doc.rect(20, 80, 170, 25, 'S');
       
-      // Cabeçalho da tabela
+      doc.setFont("helvetica", "bold");
+      doc.text("Solicitante:", 25, 88);
+      doc.setFont("helvetica", "normal");
+      doc.text(formData.nomeSolicitante, 55, 88);
+      
+      doc.setFont("helvetica", "bold");
+      doc.text("Empresa:", 25, 95);
+      doc.setFont("helvetica", "normal");
+      doc.text(formData.nomeEmpresa, 50, 95);
+      
+      doc.setFont("helvetica", "bold");
+      doc.text("Data:", 25, 102);
+      doc.setFont("helvetica", "normal");
+      doc.text(formData.dataSolicitacao, 40, 102);
+      
+      // Tabela de itens com design melhorado
+      let yPosition = 120;
+      
+      // Cabeçalho da tabela com cores
+      doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+      doc.rect(20, yPosition - 8, 170, 12, 'F');
+      
       doc.setFont("helvetica", "bold");
       doc.setFontSize(9);
+      doc.setTextColor(255, 255, 255);
       
       // Desenhar bordas do cabeçalho
-      doc.rect(20, yPosition - 5, 20, 10); // ITEM
-      doc.rect(40, yPosition - 5, 60, 10); // DESCRIÇÃO
-      doc.rect(100, yPosition - 5, 20, 10); // QTD
-      doc.rect(120, yPosition - 5, 30, 10); // VALOR UNIT.
-      doc.rect(150, yPosition - 5, 30, 10); // VALOR TOTAL
+      doc.setDrawColor(255, 255, 255);
+      doc.setLineWidth(0.5);
+      doc.rect(20, yPosition - 8, 25, 12); // ITEM
+      doc.rect(45, yPosition - 8, 70, 12); // DESCRIÇÃO
+      doc.rect(115, yPosition - 8, 20, 12); // QTD
+      doc.rect(135, yPosition - 8, 27, 12); // VALOR UNIT.
+      doc.rect(162, yPosition - 8, 28, 12); // VALOR TOTAL
       
       // Texto do cabeçalho
-      doc.text("ITEM", 22, yPosition);
-      doc.text("DESCRIÇÃO", 42, yPosition);
-      doc.text("QTD", 102, yPosition);
-      doc.text("VALOR UNIT.", 122, yPosition);
-      doc.text("VALOR TOTAL", 152, yPosition);
+      doc.text("ITEM", 32, yPosition - 2, { align: "center" });
+      doc.text("DESCRIÇÃO", 80, yPosition - 2, { align: "center" });
+      doc.text("QTD", 125, yPosition - 2, { align: "center" });
+      doc.text("VALOR UNIT.", 148, yPosition - 2, { align: "center" });
+      doc.text("VALOR TOTAL", 176, yPosition - 2, { align: "center" });
       
-      yPosition += 10;
+      yPosition += 7;
       
-      // Itens da tabela
+      // Itens da tabela com cores alternadas
       doc.setFont("helvetica", "normal");
-      items.forEach((item) => {
+      doc.setTextColor(0, 0, 0);
+      doc.setDrawColor(200, 200, 200);
+      
+      items.forEach((item, index) => {
         if (yPosition > 250) {
           doc.addPage();
           yPosition = 20;
         }
         
+        // Cor de fundo alternada
+        if (index % 2 === 0) {
+          doc.setFillColor(248, 248, 248);
+          doc.rect(20, yPosition - 5, 170, 10, 'F');
+        }
+        
         // Desenhar bordas das células
-        doc.rect(20, yPosition - 5, 20, 10); // ITEM
-        doc.rect(40, yPosition - 5, 60, 10); // DESCRIÇÃO
-        doc.rect(100, yPosition - 5, 20, 10); // QTD
-        doc.rect(120, yPosition - 5, 30, 10); // VALOR UNIT.
-        doc.rect(150, yPosition - 5, 30, 10); // VALOR TOTAL
+        doc.rect(20, yPosition - 5, 25, 10); // ITEM
+        doc.rect(45, yPosition - 5, 70, 10); // DESCRIÇÃO
+        doc.rect(115, yPosition - 5, 20, 10); // QTD
+        doc.rect(135, yPosition - 5, 27, 10); // VALOR UNIT.
+        doc.rect(162, yPosition - 5, 28, 10); // VALOR TOTAL
         
         // Texto das células
-        doc.text(item.item.substring(0, 15), 22, yPosition);
-        doc.text(item.descricao.substring(0, 40), 42, yPosition);
-        doc.text(item.quantidade.toString(), 102, yPosition);
-        doc.text(`R$ ${item.valorUnitario.toFixed(2)}`, 122, yPosition);
-        doc.text(`R$ ${item.valorTotal.toFixed(2)}`, 152, yPosition);
+        doc.text(item.item.substring(0, 20), 22, yPosition);
+        doc.text(item.descricao.substring(0, 45), 47, yPosition);
+        doc.text(item.quantidade.toString(), 125, yPosition, { align: "center" });
+        doc.text(`R$ ${item.valorUnitario.toFixed(2)}`, 148, yPosition, { align: "center" });
+        doc.text(`R$ ${item.valorTotal.toFixed(2)}`, 176, yPosition, { align: "center" });
         yPosition += 10;
       });
       
-      // Total geral com borda
+      // Total geral destacado
+      doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+      doc.rect(20, yPosition - 5, 142, 10, 'F');
+      doc.rect(162, yPosition - 5, 28, 10, 'F');
+      
       doc.setFont("helvetica", "bold");
-      doc.rect(20, yPosition - 5, 130, 10); // Célula do texto "TOTAL GERAL"
-      doc.rect(150, yPosition - 5, 30, 10); // Célula do valor total
+      doc.setTextColor(255, 255, 255);
+      doc.text("TOTAL GERAL:", 148, yPosition, { align: "center" });
+      doc.text(`R$ ${getTotalGeral().toFixed(2)}`, 176, yPosition, { align: "center" });
       
-      doc.text("TOTAL GERAL:", 22, yPosition);
-      doc.text(`R$ ${getTotalGeral().toFixed(2)}`, 152, yPosition);
-      
-      // Observações
+      // Observações com caixa
       if (formData.observacoes) {
         yPosition += 20;
+        doc.setFillColor(250, 250, 250);
+        doc.setDrawColor(200, 200, 200);
+        doc.setTextColor(0, 0, 0);
+        
+        const observHeight = Math.max(20, doc.splitTextToSize(formData.observacoes, 160).length * 5 + 10);
+        doc.rect(20, yPosition - 5, 170, observHeight, 'FD');
+        
         doc.setFont("helvetica", "bold");
-        doc.text("OBSERVAÇÕES:", 20, yPosition);
-        yPosition += 7;
+        doc.text("OBSERVAÇÕES:", 25, yPosition + 2);
+        yPosition += 10;
         doc.setFont("helvetica", "normal");
-        const splitText = doc.splitTextToSize(formData.observacoes, 170);
-        doc.text(splitText, 20, yPosition);
+        const splitText = doc.splitTextToSize(formData.observacoes, 160);
+        doc.text(splitText, 25, yPosition);
+        yPosition += observHeight - 10;
       }
       
-      // Espaço para assinatura
+      // Assinatura com design elegante
       yPosition += 30;
-      doc.line(20, yPosition, 90, yPosition);
-      doc.text("Assinatura do Solicitante", 20, yPosition + 10);
+      doc.setDrawColor(darkGray[0], darkGray[1], darkGray[2]);
+      doc.setLineWidth(1);
+      doc.line(20, yPosition, 100, yPosition);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.text("Assinatura do Solicitante", 20, yPosition + 8);
+      
+      // Data e local
+      doc.line(120, yPosition, 190, yPosition);
+      doc.text(`Inajá - PR, ${format(new Date(), 'dd/MM/yyyy', { locale: ptBR })}`, 120, yPosition + 8);
+      
+      // Rodapé
+      doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+      doc.rect(0, 289, 210, 8, 'F');
       
       doc.save(`Solicitacao_Fornecimento_${formData.dataSolicitacao.replace(/\//g, '')}.pdf`);
       
@@ -237,6 +316,272 @@ const Index = () => {
         description: "O arquivo foi baixado com sucesso!",
       });
     });
+  };
+
+  const exportToWord = async () => {
+    try {
+      const doc = new Document({
+        sections: [{
+          properties: {
+            page: {
+              margin: {
+                top: 720,
+                right: 720,
+                bottom: 720,
+                left: 720,
+              },
+            },
+          },
+          children: [
+            // Cabeçalho com formatação elegante
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "PREFEITURA MUNICIPAL DE INAJÁ",
+                  bold: true,
+                  size: 32,
+                  color: "2980B9",
+                }),
+              ],
+              alignment: AlignmentType.CENTER,
+              spacing: { after: 200 },
+            }),
+            new Paragraph({
+              text: "Av. Antônio Veiga Martins, 80 - CEP: 87670-000",
+              alignment: AlignmentType.CENTER,
+              spacing: { after: 100 },
+            }),
+            new Paragraph({
+              text: "Telefone: (44) 3112-4320 | E-mail: prefeito@inaja.pr.gov.br",
+              alignment: AlignmentType.CENTER,
+              spacing: { after: 400 },
+            }),
+            
+            // Título do documento
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "SOLICITAÇÃO DE FORNECIMENTO",
+                  bold: true,
+                  size: 28,
+                  color: "2980B9",
+                }),
+              ],
+              alignment: AlignmentType.CENTER,
+              spacing: { after: 400 },
+            }),
+            
+            // Informações do formulário
+            new Paragraph({
+              children: [
+                new TextRun({ text: "Solicitante: ", bold: true }),
+                new TextRun({ text: formData.nomeSolicitante }),
+              ],
+              spacing: { after: 200 },
+            }),
+            new Paragraph({
+              children: [
+                new TextRun({ text: "Empresa: ", bold: true }),
+                new TextRun({ text: formData.nomeEmpresa }),
+              ],
+              spacing: { after: 200 },
+            }),
+            new Paragraph({
+              children: [
+                new TextRun({ text: "Data: ", bold: true }),
+                new TextRun({ text: formData.dataSolicitacao }),
+              ],
+              spacing: { after: 400 },
+            }),
+            
+            // Tabela melhorada
+            new Table({
+              width: {
+                size: 100,
+                type: WidthType.PERCENTAGE,
+              },
+              borders: {
+                top: { style: BorderStyle.SINGLE, size: 4, color: "2980B9" },
+                bottom: { style: BorderStyle.SINGLE, size: 4, color: "2980B9" },
+                left: { style: BorderStyle.SINGLE, size: 4, color: "2980B9" },
+                right: { style: BorderStyle.SINGLE, size: 4, color: "2980B9" },
+                insideHorizontal: { style: BorderStyle.SINGLE, size: 2, color: "BDC3C7" },
+                insideVertical: { style: BorderStyle.SINGLE, size: 2, color: "BDC3C7" },
+              },
+              rows: [
+                // Cabeçalho da tabela
+                new TableRow({
+                  children: [
+                    new TableCell({ 
+                      children: [new Paragraph({ 
+                        children: [new TextRun({ text: "ITEM", bold: true, color: "FFFFFF" })],
+                        alignment: AlignmentType.CENTER,
+                      })],
+                      shading: { fill: "2980B9" },
+                      width: { size: 15, type: WidthType.PERCENTAGE },
+                    }),
+                    new TableCell({ 
+                      children: [new Paragraph({ 
+                        children: [new TextRun({ text: "DESCRIÇÃO", bold: true, color: "FFFFFF" })],
+                        alignment: AlignmentType.CENTER,
+                      })],
+                      shading: { fill: "2980B9" },
+                      width: { size: 40, type: WidthType.PERCENTAGE },
+                    }),
+                    new TableCell({ 
+                      children: [new Paragraph({ 
+                        children: [new TextRun({ text: "QTD", bold: true, color: "FFFFFF" })],
+                        alignment: AlignmentType.CENTER,
+                      })],
+                      shading: { fill: "2980B9" },
+                      width: { size: 15, type: WidthType.PERCENTAGE },
+                    }),
+                    new TableCell({ 
+                      children: [new Paragraph({ 
+                        children: [new TextRun({ text: "VALOR UNIT.", bold: true, color: "FFFFFF" })],
+                        alignment: AlignmentType.CENTER,
+                      })],
+                      shading: { fill: "2980B9" },
+                      width: { size: 15, type: WidthType.PERCENTAGE },
+                    }),
+                    new TableCell({ 
+                      children: [new Paragraph({ 
+                        children: [new TextRun({ text: "VALOR TOTAL", bold: true, color: "FFFFFF" })],
+                        alignment: AlignmentType.CENTER,
+                      })],
+                      shading: { fill: "2980B9" },
+                      width: { size: 15, type: WidthType.PERCENTAGE },
+                    }),
+                  ],
+                }),
+                // Linhas dos itens
+                ...items.map((item, index) => new TableRow({
+                  children: [
+                    new TableCell({ 
+                      children: [new Paragraph(item.item)],
+                      shading: { fill: index % 2 === 0 ? "F8F9FA" : "FFFFFF" },
+                    }),
+                    new TableCell({ 
+                      children: [new Paragraph(item.descricao)],
+                      shading: { fill: index % 2 === 0 ? "F8F9FA" : "FFFFFF" },
+                    }),
+                    new TableCell({ 
+                      children: [new Paragraph({ 
+                        text: item.quantidade.toString(),
+                        alignment: AlignmentType.CENTER,
+                      })],
+                      shading: { fill: index % 2 === 0 ? "F8F9FA" : "FFFFFF" },
+                    }),
+                    new TableCell({ 
+                      children: [new Paragraph({ 
+                        text: `R$ ${item.valorUnitario.toFixed(2)}`,
+                        alignment: AlignmentType.RIGHT,
+                      })],
+                      shading: { fill: index % 2 === 0 ? "F8F9FA" : "FFFFFF" },
+                    }),
+                    new TableCell({ 
+                      children: [new Paragraph({ 
+                        text: `R$ ${item.valorTotal.toFixed(2)}`,
+                        alignment: AlignmentType.RIGHT,
+                      })],
+                      shading: { fill: index % 2 === 0 ? "F8F9FA" : "FFFFFF" },
+                    }),
+                  ],
+                })),
+                // Total geral
+                new TableRow({
+                  children: [
+                    new TableCell({ 
+                      children: [new Paragraph("")],
+                      columnSpan: 4,
+                      shading: { fill: "2980B9" },
+                    }),
+                    new TableCell({ 
+                      children: [new Paragraph({ 
+                        children: [new TextRun({ text: "TOTAL GERAL:", bold: true, color: "FFFFFF" })],
+                        alignment: AlignmentType.CENTER,
+                      })],
+                      shading: { fill: "2980B9" },
+                    }),
+                    new TableCell({ 
+                      children: [new Paragraph({ 
+                        children: [new TextRun({ text: `R$ ${getTotalGeral().toFixed(2)}`, bold: true, color: "FFFFFF" })],
+                        alignment: AlignmentType.RIGHT,
+                      })],
+                      shading: { fill: "2980B9" },
+                    }),
+                  ],
+                }),
+              ],
+            }),
+            
+            // Observações
+            new Paragraph({
+              text: "",
+              spacing: { after: 400 },
+            }),
+            ...(formData.observacoes ? [
+              new Paragraph({
+                children: [new TextRun({ text: "OBSERVAÇÕES:", bold: true })],
+                spacing: { after: 200 },
+              }),
+              new Paragraph({
+                text: formData.observacoes,
+                spacing: { after: 400 },
+              }),
+            ] : []),
+            
+            // Assinatura
+            new Paragraph({
+              text: "",
+              spacing: { after: 800 },
+            }),
+            new Paragraph({
+              text: "_________________________________",
+              spacing: { after: 200 },
+            }),
+            new Paragraph({
+              text: "Assinatura do Solicitante",
+            }),
+            new Paragraph({
+              text: `Inajá - PR, ${format(new Date(), 'dd/MM/yyyy', { locale: ptBR })}`,
+              alignment: AlignmentType.RIGHT,
+            }),
+          ],
+        }],
+      });
+
+      const buffer = await Packer.toBuffer(doc);
+      const blob = new Blob([buffer], { 
+        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
+      });
+      
+      // Criar link de download
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Solicitacao_Fornecimento_${formData.dataSolicitacao.replace(/\//g, '')}.docx`;
+      
+      // Adicionar ao DOM, clicar e remover
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Limpar URL
+      window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Word exportado",
+        description: "O arquivo foi baixado com sucesso!",
+      });
+    } catch (error) {
+      console.error('Erro ao exportar Word:', error);
+      toast({
+        title: "Erro ao exportar Word",
+        description: "Ocorreu um erro durante a exportação. Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   const exportToExcel = () => {
@@ -270,247 +615,6 @@ const Index = () => {
     
     toast({
       title: "Excel exportado",
-      description: "O arquivo foi baixado com sucesso!",
-    });
-  };
-
-  const exportToWord = async () => {
-    const doc = new Document({
-      sections: [{
-        properties: {},
-        children: [
-          new Paragraph({
-            text: "PREFEITURA MUNICIPAL DE INAJÁ",
-            heading: HeadingLevel.HEADING_1,
-            alignment: AlignmentType.CENTER,
-          }),
-          new Paragraph({
-            text: "Av. Antônio Veiga Martins, 80 - CEP: 87670-000",
-            alignment: AlignmentType.CENTER,
-          }),
-          new Paragraph({
-            text: "Telefone: (44) 3112-4320 | E-mail: prefeito@inaja.pr.gov.br",
-            alignment: AlignmentType.CENTER,
-          }),
-          new Paragraph({
-            text: "",
-          }),
-          new Paragraph({
-            text: "SOLICITAÇÃO DE FORNECIMENTO",
-            heading: HeadingLevel.HEADING_2,
-            alignment: AlignmentType.CENTER,
-          }),
-          new Paragraph({
-            text: "",
-          }),
-          new Paragraph({
-            text: `Solicitante: ${formData.nomeSolicitante}`,
-          }),
-          new Paragraph({
-            text: `Empresa: ${formData.nomeEmpresa}`,
-          }),
-          new Paragraph({
-            text: `Data: ${formData.dataSolicitacao}`,
-          }),
-          new Paragraph({
-            text: "",
-          }),
-          new Table({
-            width: {
-              size: 100,
-              type: WidthType.PERCENTAGE,
-            },
-            borders: {
-              top: { style: BorderStyle.SINGLE, size: 1 },
-              bottom: { style: BorderStyle.SINGLE, size: 1 },
-              left: { style: BorderStyle.SINGLE, size: 1 },
-              right: { style: BorderStyle.SINGLE, size: 1 },
-              insideHorizontal: { style: BorderStyle.SINGLE, size: 1 },
-              insideVertical: { style: BorderStyle.SINGLE, size: 1 },
-            },
-            rows: [
-              new TableRow({
-                children: [
-                  new TableCell({ 
-                    children: [new Paragraph("ITEM")],
-                    borders: {
-                      top: { style: BorderStyle.SINGLE, size: 1 },
-                      bottom: { style: BorderStyle.SINGLE, size: 1 },
-                      left: { style: BorderStyle.SINGLE, size: 1 },
-                      right: { style: BorderStyle.SINGLE, size: 1 },
-                    }
-                  }),
-                  new TableCell({ 
-                    children: [new Paragraph("DESCRIÇÃO")],
-                    borders: {
-                      top: { style: BorderStyle.SINGLE, size: 1 },
-                      bottom: { style: BorderStyle.SINGLE, size: 1 },
-                      left: { style: BorderStyle.SINGLE, size: 1 },
-                      right: { style: BorderStyle.SINGLE, size: 1 },
-                    }
-                  }),
-                  new TableCell({ 
-                    children: [new Paragraph("QTD")],
-                    borders: {
-                      top: { style: BorderStyle.SINGLE, size: 1 },
-                      bottom: { style: BorderStyle.SINGLE, size: 1 },
-                      left: { style: BorderStyle.SINGLE, size: 1 },
-                      right: { style: BorderStyle.SINGLE, size: 1 },
-                    }
-                  }),
-                  new TableCell({ 
-                    children: [new Paragraph("VALOR UNIT.")],
-                    borders: {
-                      top: { style: BorderStyle.SINGLE, size: 1 },
-                      bottom: { style: BorderStyle.SINGLE, size: 1 },
-                      left: { style: BorderStyle.SINGLE, size: 1 },
-                      right: { style: BorderStyle.SINGLE, size: 1 },
-                    }
-                  }),
-                  new TableCell({ 
-                    children: [new Paragraph("VALOR TOTAL")],
-                    borders: {
-                      top: { style: BorderStyle.SINGLE, size: 1 },
-                      bottom: { style: BorderStyle.SINGLE, size: 1 },
-                      left: { style: BorderStyle.SINGLE, size: 1 },
-                      right: { style: BorderStyle.SINGLE, size: 1 },
-                    }
-                  }),
-                ],
-              }),
-              ...items.map(item => new TableRow({
-                children: [
-                  new TableCell({ 
-                    children: [new Paragraph(item.item)],
-                    borders: {
-                      top: { style: BorderStyle.SINGLE, size: 1 },
-                      bottom: { style: BorderStyle.SINGLE, size: 1 },
-                      left: { style: BorderStyle.SINGLE, size: 1 },
-                      right: { style: BorderStyle.SINGLE, size: 1 },
-                    }
-                  }),
-                  new TableCell({ 
-                    children: [new Paragraph(item.descricao)],
-                    borders: {
-                      top: { style: BorderStyle.SINGLE, size: 1 },
-                      bottom: { style: BorderStyle.SINGLE, size: 1 },
-                      left: { style: BorderStyle.SINGLE, size: 1 },
-                      right: { style: BorderStyle.SINGLE, size: 1 },
-                    }
-                  }),
-                  new TableCell({ 
-                    children: [new Paragraph(item.quantidade.toString())],
-                    borders: {
-                      top: { style: BorderStyle.SINGLE, size: 1 },
-                      bottom: { style: BorderStyle.SINGLE, size: 1 },
-                      left: { style: BorderStyle.SINGLE, size: 1 },
-                      right: { style: BorderStyle.SINGLE, size: 1 },
-                    }
-                  }),
-                  new TableCell({ 
-                    children: [new Paragraph(`R$ ${item.valorUnitario.toFixed(2)}`)],
-                    borders: {
-                      top: { style: BorderStyle.SINGLE, size: 1 },
-                      bottom: { style: BorderStyle.SINGLE, size: 1 },
-                      left: { style: BorderStyle.SINGLE, size: 1 },
-                      right: { style: BorderStyle.SINGLE, size: 1 },
-                    }
-                  }),
-                  new TableCell({ 
-                    children: [new Paragraph(`R$ ${item.valorTotal.toFixed(2)}`)],
-                    borders: {
-                      top: { style: BorderStyle.SINGLE, size: 1 },
-                      bottom: { style: BorderStyle.SINGLE, size: 1 },
-                      left: { style: BorderStyle.SINGLE, size: 1 },
-                      right: { style: BorderStyle.SINGLE, size: 1 },
-                    }
-                  }),
-                ],
-              })),
-              new TableRow({
-                children: [
-                  new TableCell({ 
-                    children: [new Paragraph("")],
-                    borders: {
-                      top: { style: BorderStyle.SINGLE, size: 1 },
-                      bottom: { style: BorderStyle.SINGLE, size: 1 },
-                      left: { style: BorderStyle.SINGLE, size: 1 },
-                      right: { style: BorderStyle.SINGLE, size: 1 },
-                    }
-                  }),
-                  new TableCell({ 
-                    children: [new Paragraph("")],
-                    borders: {
-                      top: { style: BorderStyle.SINGLE, size: 1 },
-                      bottom: { style: BorderStyle.SINGLE, size: 1 },
-                      left: { style: BorderStyle.SINGLE, size: 1 },
-                      right: { style: BorderStyle.SINGLE, size: 1 },
-                    }
-                  }),
-                  new TableCell({ 
-                    children: [new Paragraph("")],
-                    borders: {
-                      top: { style: BorderStyle.SINGLE, size: 1 },
-                      bottom: { style: BorderStyle.SINGLE, size: 1 },
-                      left: { style: BorderStyle.SINGLE, size: 1 },
-                      right: { style: BorderStyle.SINGLE, size: 1 },
-                    }
-                  }),
-                  new TableCell({ 
-                    children: [new Paragraph("TOTAL GERAL:")],
-                    borders: {
-                      top: { style: BorderStyle.SINGLE, size: 1 },
-                      bottom: { style: BorderStyle.SINGLE, size: 1 },
-                      left: { style: BorderStyle.SINGLE, size: 1 },
-                      right: { style: BorderStyle.SINGLE, size: 1 },
-                    }
-                  }),
-                  new TableCell({ 
-                    children: [new Paragraph(`R$ ${getTotalGeral().toFixed(2)}`)],
-                    borders: {
-                      top: { style: BorderStyle.SINGLE, size: 1 },
-                      bottom: { style: BorderStyle.SINGLE, size: 1 },
-                      left: { style: BorderStyle.SINGLE, size: 1 },
-                      right: { style: BorderStyle.SINGLE, size: 1 },
-                    }
-                  }),
-                ],
-              }),
-            ],
-          }),
-          new Paragraph({
-            text: "",
-          }),
-          new Paragraph({
-            text: "OBSERVAÇÕES:",
-          }),
-          new Paragraph({
-            text: formData.observacoes,
-          }),
-          new Paragraph({
-            text: "",
-          }),
-          new Paragraph({
-            text: "_________________________________",
-          }),
-          new Paragraph({
-            text: "Assinatura do Solicitante",
-          }),
-        ],
-      }],
-    });
-
-    const buffer = await Packer.toBuffer(doc);
-    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Solicitacao_Fornecimento_${formData.dataSolicitacao.replace(/\//g, '')}.docx`;
-    a.click();
-    URL.revokeObjectURL(url);
-    
-    toast({
-      title: "Word exportado",
       description: "O arquivo foi baixado com sucesso!",
     });
   };
