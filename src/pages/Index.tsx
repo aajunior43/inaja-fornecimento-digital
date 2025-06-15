@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -110,84 +109,112 @@ const Index = () => {
   const exportToPDF = () => {
     const doc = new jsPDF();
     
-    // Cabeçalho
-    doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
-    doc.text("PREFEITURA MUNICIPAL DE INAJÁ", 105, 20, { align: "center" });
-    
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "normal");
-    doc.text("Av. Antônio Veiga Martins, 80 - CEP: 87670-000", 105, 30, { align: "center" });
-    doc.text("Telefone: (44) 3112-4320", 105, 37, { align: "center" });
-    doc.text("E-mail: prefeito@inaja.pr.gov.br", 105, 44, { align: "center" });
-    
-    // Título do documento
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
-    doc.text("SOLICITAÇÃO DE FORNECIMENTO", 105, 60, { align: "center" });
-    
-    // Dados do formulário
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.text(`Solicitante: ${formData.nomeSolicitante}`, 20, 80);
-    doc.text(`Empresa: ${formData.nomeEmpresa}`, 20, 87);
-    doc.text(`Data: ${formData.dataSolicitacao}`, 20, 94);
-    
-    // Tabela de itens
-    let yPosition = 110;
-    doc.setFont("helvetica", "bold");
-    doc.text("ITEM", 20, yPosition);
-    doc.text("DESCRIÇÃO", 40, yPosition);
-    doc.text("QTD", 120, yPosition);
-    doc.text("VALOR UNIT.", 140, yPosition);
-    doc.text("VALOR TOTAL", 170, yPosition);
-    
-    yPosition += 7;
-    doc.line(20, yPosition, 190, yPosition);
-    yPosition += 5;
-    
-    doc.setFont("helvetica", "normal");
-    items.forEach((item) => {
-      if (yPosition > 250) {
-        doc.addPage();
-        yPosition = 20;
+    // Função para converter imagem para base64
+    const addImageToPDF = (imageSrc: string) => {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx?.drawImage(img, 0, 0);
+          const dataURL = canvas.toDataURL('image/png');
+          resolve(dataURL);
+        };
+        img.onerror = function() {
+          resolve(null);
+        };
+        img.src = imageSrc;
+      });
+    };
+
+    // Adicionar logo
+    addImageToPDF('/lovable-uploads/007f16c7-9a20-4239-954a-386da9c3b0b4.png').then((logoBase64: any) => {
+      if (logoBase64) {
+        doc.addImage(logoBase64, 'PNG', 15, 10, 20, 20);
       }
-      doc.text(item.item, 20, yPosition);
-      doc.text(item.descricao.substring(0, 30), 40, yPosition);
-      doc.text(item.quantidade.toString(), 120, yPosition);
-      doc.text(`R$ ${item.valorUnitario.toFixed(2)}`, 140, yPosition);
-      doc.text(`R$ ${item.valorTotal.toFixed(2)}`, 170, yPosition);
-      yPosition += 7;
-    });
-    
-    // Total geral
-    yPosition += 5;
-    doc.line(20, yPosition, 190, yPosition);
-    yPosition += 7;
-    doc.setFont("helvetica", "bold");
-    doc.text(`TOTAL GERAL: R$ ${getTotalGeral().toFixed(2)}`, 170, yPosition, { align: "right" });
-    
-    // Observações
-    if (formData.observacoes) {
-      yPosition += 15;
+      
+      // Cabeçalho
+      doc.setFontSize(16);
       doc.setFont("helvetica", "bold");
-      doc.text("OBSERVAÇÕES:", 20, yPosition);
-      yPosition += 7;
+      doc.text("PREFEITURA MUNICIPAL DE INAJÁ", 105, 20, { align: "center" });
+      
+      doc.setFontSize(12);
       doc.setFont("helvetica", "normal");
-      const splitText = doc.splitTextToSize(formData.observacoes, 170);
-      doc.text(splitText, 20, yPosition);
-    }
-    
-    // Espaço para assinatura
-    yPosition += 30;
-    doc.line(20, yPosition, 90, yPosition);
-    doc.text("Assinatura do Solicitante", 20, yPosition + 10);
-    
-    doc.save(`Solicitacao_Fornecimento_${formData.dataSolicitacao.replace(/\//g, '')}.pdf`);
-    
-    toast({
-      title: "PDF exportado",
-      description: "O arquivo foi baixado com sucesso!",
+      doc.text("Av. Antônio Veiga Martins, 80 - CEP: 87670-000", 105, 30, { align: "center" });
+      doc.text("Telefone: (44) 3112-4320", 105, 37, { align: "center" });
+      doc.text("E-mail: prefeito@inaja.pr.gov.br", 105, 44, { align: "center" });
+      
+      // Título do documento
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text("SOLICITAÇÃO DE FORNECIMENTO", 105, 60, { align: "center" });
+      
+      // Dados do formulário
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.text(`Solicitante: ${formData.nomeSolicitante}`, 20, 80);
+      doc.text(`Empresa: ${formData.nomeEmpresa}`, 20, 87);
+      doc.text(`Data: ${formData.dataSolicitacao}`, 20, 94);
+      
+      // Tabela de itens
+      let yPosition = 110;
+      doc.setFont("helvetica", "bold");
+      doc.text("ITEM", 20, yPosition);
+      doc.text("DESCRIÇÃO", 40, yPosition);
+      doc.text("QTD", 120, yPosition);
+      doc.text("VALOR UNIT.", 140, yPosition);
+      doc.text("VALOR TOTAL", 170, yPosition);
+      
+      yPosition += 7;
+      doc.line(20, yPosition, 190, yPosition);
+      yPosition += 5;
+      
+      doc.setFont("helvetica", "normal");
+      items.forEach((item) => {
+        if (yPosition > 250) {
+          doc.addPage();
+          yPosition = 20;
+        }
+        doc.text(item.item, 20, yPosition);
+        doc.text(item.descricao.substring(0, 30), 40, yPosition);
+        doc.text(item.quantidade.toString(), 120, yPosition);
+        doc.text(`R$ ${item.valorUnitario.toFixed(2)}`, 140, yPosition);
+        doc.text(`R$ ${item.valorTotal.toFixed(2)}`, 170, yPosition);
+        yPosition += 7;
+      });
+      
+      // Total geral
+      yPosition += 5;
+      doc.line(20, yPosition, 190, yPosition);
+      yPosition += 7;
+      doc.setFont("helvetica", "bold");
+      doc.text(`TOTAL GERAL: R$ ${getTotalGeral().toFixed(2)}`, 170, yPosition, { align: "right" });
+      
+      // Observações
+      if (formData.observacoes) {
+        yPosition += 15;
+        doc.setFont("helvetica", "bold");
+        doc.text("OBSERVAÇÕES:", 20, yPosition);
+        yPosition += 7;
+        doc.setFont("helvetica", "normal");
+        const splitText = doc.splitTextToSize(formData.observacoes, 170);
+        doc.text(splitText, 20, yPosition);
+      }
+      
+      // Espaço para assinatura
+      yPosition += 30;
+      doc.line(20, yPosition, 90, yPosition);
+      doc.text("Assinatura do Solicitante", 20, yPosition + 10);
+      
+      doc.save(`Solicitacao_Fornecimento_${formData.dataSolicitacao.replace(/\//g, '')}.pdf`);
+      
+      toast({
+        title: "PDF exportado",
+        description: "O arquivo foi baixado com sucesso!",
+      });
     });
   };
 
