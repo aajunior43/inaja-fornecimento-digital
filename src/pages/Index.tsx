@@ -819,14 +819,6 @@ const Index = () => {
                     </Button>
                     <Separator className="bg-gradient-to-r from-slate-600/50 to-slate-500/50" />
                     <Button 
-                      onClick={() => navigate('/admin/login')} 
-                      className="w-full bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-                      size="sm"
-                    >
-                      <Shield className="mr-2 h-4 w-4" />
-                      Área Administrativa
-                    </Button>
-                    <Button 
                       onClick={clearForm} 
                       variant="destructive" 
                       className="w-full text-sm sm:text-base bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
