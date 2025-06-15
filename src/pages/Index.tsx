@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { Plus, Minus, FileText, Download, Trash2, Eye } from "lucide-react";
+import { Plus, Minus, FileText, Download, Trash2, Eye, Menu } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
@@ -50,6 +50,7 @@ const Index = () => {
   ]);
 
   const [showPreview, setShowPreview] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const addItem = () => {
     const newItem: Item = {
@@ -602,252 +603,361 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
+    <div className="min-h-screen bg-slate-900 text-slate-100 p-2 sm:p-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header - Melhorado para mobile */}
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row items-center justify-center mb-4 space-y-2 sm:space-y-0">
             <img 
               src="/lovable-uploads/007f16c7-9a20-4239-954a-386da9c3b0b4.png" 
               alt="Brasão da Prefeitura de Inajá" 
-              className="h-16 w-16 mr-4"
+              className="h-12 w-12 sm:h-16 sm:w-16 sm:mr-4"
             />
-            <div>
-              <h1 className="text-3xl font-bold text-blue-400">Sistema de Solicitação de Fornecimento</h1>
-              <p className="text-slate-400">Prefeitura Municipal de Inajá - PR</p>
+            <div className="text-center sm:text-left">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-400">
+                Sistema de Solicitação de Fornecimento
+              </h1>
+              <p className="text-slate-400 text-sm sm:text-base">Prefeitura Municipal de Inajá - PR</p>
             </div>
           </div>
         </div>
 
         {!showPreview ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Formulário Principal */}
-            <div className="lg:col-span-2">
-              <Card className="bg-slate-800 border-slate-700">
-                <CardHeader>
-                  <CardTitle className="text-blue-400 flex items-center">
-                    <FileText className="mr-2" />
-                    Dados da Solicitação
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="solicitante" className="text-slate-300">Nome do Solicitante</Label>
-                      <Input
-                        id="solicitante"
-                        value={formData.nomeSolicitante}
-                        onChange={(e) => setFormData({ ...formData, nomeSolicitante: e.target.value })}
-                        className="bg-slate-700 border-slate-600 text-slate-100"
-                        placeholder="Digite o nome do solicitante"
-                      />
+          <div className="space-y-6">
+            {/* Layout responsivo - Stack no mobile, grid no desktop */}
+            <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+              {/* Formulário Principal */}
+              <div className="xl:col-span-3">
+                <Card className="bg-slate-800 border-slate-700">
+                  <CardHeader>
+                    <CardTitle className="text-blue-400 flex items-center text-lg sm:text-xl">
+                      <FileText className="mr-2 h-5 w-5" />
+                      Dados da Solicitação
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="solicitante" className="text-slate-300 text-sm sm:text-base">
+                          Nome do Solicitante
+                        </Label>
+                        <Input
+                          id="solicitante"
+                          value={formData.nomeSolicitante}
+                          onChange={(e) => setFormData({ ...formData, nomeSolicitante: e.target.value })}
+                          className="bg-slate-700 border-slate-600 text-slate-100 text-sm sm:text-base"
+                          placeholder="Digite o nome do solicitante"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="empresa" className="text-slate-300 text-sm sm:text-base">
+                          Nome da Empresa
+                        </Label>
+                        <Input
+                          id="empresa"
+                          value={formData.nomeEmpresa}
+                          onChange={(e) => setFormData({ ...formData, nomeEmpresa: e.target.value })}
+                          className="bg-slate-700 border-slate-600 text-slate-100 text-sm sm:text-base"
+                          placeholder="Digite o nome da empresa"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="data" className="text-slate-300 text-sm sm:text-base">
+                          Data da Solicitação
+                        </Label>
+                        <Input
+                          id="data"
+                          value={formData.dataSolicitacao}
+                          onChange={(e) => setFormData({ ...formData, dataSolicitacao: e.target.value })}
+                          className="bg-slate-700 border-slate-600 text-slate-100 text-sm sm:text-base"
+                        />
+                      </div>
                     </div>
                     <div>
-                      <Label htmlFor="empresa" className="text-slate-300">Nome da Empresa</Label>
-                      <Input
-                        id="empresa"
-                        value={formData.nomeEmpresa}
-                        onChange={(e) => setFormData({ ...formData, nomeEmpresa: e.target.value })}
-                        className="bg-slate-700 border-slate-600 text-slate-100"
-                        placeholder="Digite o nome da empresa"
+                      <Label htmlFor="observacoes" className="text-slate-300 text-sm sm:text-base">
+                        Observações Gerais
+                      </Label>
+                      <Textarea
+                        id="observacoes"
+                        value={formData.observacoes}
+                        onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
+                        className="bg-slate-700 border-slate-600 text-slate-100 min-h-[80px] sm:min-h-[100px] text-sm sm:text-base"
+                        placeholder="Digite observações adicionais..."
                       />
                     </div>
-                  </div>
-                  <div>
-                    <Label htmlFor="data" className="text-slate-300">Data da Solicitação</Label>
-                    <Input
-                      id="data"
-                      value={formData.dataSolicitacao}
-                      onChange={(e) => setFormData({ ...formData, dataSolicitacao: e.target.value })}
-                      className="bg-slate-700 border-slate-600 text-slate-100"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="observacoes" className="text-slate-300">Observações Gerais</Label>
-                    <Textarea
-                      id="observacoes"
-                      value={formData.observacoes}
-                      onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
-                      className="bg-slate-700 border-slate-600 text-slate-100 min-h-[100px]"
-                      placeholder="Digite observações adicionais..."
-                    />
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Ações - Menu collapsible no mobile */}
+              <div className="xl:col-span-1">
+                <Card className="bg-slate-800 border-slate-700">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-blue-400 text-lg">Ações</CardTitle>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="xl:hidden"
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                      >
+                        <Menu className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent className={`space-y-3 ${isMobileMenuOpen ? 'block' : 'hidden xl:block'}`}>
+                    <Button 
+                      onClick={() => setShowPreview(true)} 
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-sm sm:text-base"
+                      size="sm"
+                    >
+                      <Eye className="mr-2 h-4 w-4" />
+                      Visualizar
+                    </Button>
+                    <Separator className="bg-slate-600" />
+                    <Button 
+                      onClick={exportToPDF} 
+                      className="w-full bg-red-600 hover:bg-red-700 text-sm sm:text-base"
+                      size="sm"
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Exportar PDF
+                    </Button>
+                    <Button 
+                      onClick={exportToWord} 
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-sm sm:text-base"
+                      size="sm"
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Exportar Word
+                    </Button>
+                    <Button 
+                      onClick={exportToExcel} 
+                      className="w-full bg-green-600 hover:bg-green-700 text-sm sm:text-base"
+                      size="sm"
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Exportar Excel
+                    </Button>
+                    <Separator className="bg-slate-600" />
+                    <Button 
+                      onClick={clearForm} 
+                      variant="destructive" 
+                      className="w-full text-sm sm:text-base"
+                      size="sm"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Limpar Formulário
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
 
-            {/* Ações */}
-            <div>
-              <Card className="bg-slate-800 border-slate-700">
-                <CardHeader>
-                  <CardTitle className="text-blue-400">Ações</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <Button 
-                    onClick={() => setShowPreview(true)} 
-                    className="w-full bg-blue-600 hover:bg-blue-700"
-                  >
-                    <Eye className="mr-2 h-4 w-4" />
-                    Visualizar
-                  </Button>
-                  <Separator className="bg-slate-600" />
-                  <Button 
-                    onClick={exportToPDF} 
-                    className="w-full bg-red-600 hover:bg-red-700"
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Exportar PDF
-                  </Button>
-                  <Button 
-                    onClick={exportToWord} 
-                    className="w-full bg-blue-600 hover:bg-blue-700"
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Exportar Word
-                  </Button>
-                  <Button 
-                    onClick={exportToExcel} 
-                    className="w-full bg-green-600 hover:bg-green-700"
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Exportar Excel
-                  </Button>
-                  <Separator className="bg-slate-600" />
-                  <Button 
-                    onClick={clearForm} 
-                    variant="destructive" 
-                    className="w-full"
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Limpar Formulário
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Tabela de Itens */}
-            <div className="lg:col-span-3">
-              <Card className="bg-slate-800 border-slate-700">
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="text-blue-400">Itens da Solicitação</CardTitle>
-                  <Button 
-                    onClick={addItem} 
-                    size="sm" 
-                    className="bg-green-600 hover:bg-green-700"
-                  >
-                    <Plus className="h-4 w-4 mr-1" />
-                    Adicionar Item
-                  </Button>
-                </CardHeader>
-                <CardContent>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b border-slate-600">
-                          <th className="text-left p-2 text-slate-300">Item</th>
-                          <th className="text-left p-2 text-slate-300">Descrição</th>
-                          <th className="text-left p-2 text-slate-300">Qtd</th>
-                          <th className="text-left p-2 text-slate-300">Valor Unit.</th>
-                          <th className="text-left p-2 text-slate-300">Valor Total</th>
-                          <th className="text-left p-2 text-slate-300">Ações</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {items.map((item) => (
-                          <tr key={item.id} className="border-b border-slate-700">
-                            <td className="p-2">
-                              <Input
-                                value={item.item}
-                                onChange={(e) => updateItem(item.id, 'item', e.target.value)}
-                                className="bg-slate-700 border-slate-600 text-slate-100"
-                                placeholder="Item"
-                              />
-                            </td>
-                            <td className="p-2">
-                              <Input
-                                value={item.descricao}
-                                onChange={(e) => updateItem(item.id, 'descricao', e.target.value)}
-                                className="bg-slate-700 border-slate-600 text-slate-100"
-                                placeholder="Descrição"
-                              />
-                            </td>
-                            <td className="p-2">
-                              <Input
-                                type="number"
-                                value={item.quantidade}
-                                onChange={(e) => updateItem(item.id, 'quantidade', parseFloat(e.target.value) || 0)}
-                                className="bg-slate-700 border-slate-600 text-slate-100"
-                                placeholder="0"
-                              />
-                            </td>
-                            <td className="p-2">
-                              <Input
-                                type="number"
-                                step="0.01"
-                                value={item.valorUnitario}
-                                onChange={(e) => updateItem(item.id, 'valorUnitario', parseFloat(e.target.value) || 0)}
-                                className="bg-slate-700 border-slate-600 text-slate-100"
-                                placeholder="0,00"
-                              />
-                            </td>
-                            <td className="p-2">
-                              <div className="p-2 bg-slate-700 rounded text-slate-100 text-right">
-                                R$ {item.valorTotal.toFixed(2)}
-                              </div>
-                            </td>
-                            <td className="p-2">
-                              <Button
-                                onClick={() => removeItem(item.id)}
-                                size="sm"
-                                variant="destructive"
-                                disabled={items.length === 1}
-                              >
-                                <Minus className="h-4 w-4" />
-                              </Button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                      <tfoot>
-                        <tr className="border-t border-slate-600">
-                          <td colSpan={4} className="p-2 text-right font-bold text-slate-300">
-                            TOTAL GERAL:
+            {/* Tabela de Itens - Completamente responsiva */}
+            <Card className="bg-slate-800 border-slate-700">
+              <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0">
+                <CardTitle className="text-blue-400 text-lg sm:text-xl">Itens da Solicitação</CardTitle>
+                <Button 
+                  onClick={addItem} 
+                  size="sm" 
+                  className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Adicionar Item
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {/* Tabela desktop */}
+                <div className="hidden lg:block overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-slate-600">
+                        <th className="text-left p-2 text-slate-300 text-sm">Item</th>
+                        <th className="text-left p-2 text-slate-300 text-sm">Descrição</th>
+                        <th className="text-left p-2 text-slate-300 text-sm">Qtd</th>
+                        <th className="text-left p-2 text-slate-300 text-sm">Valor Unit.</th>
+                        <th className="text-left p-2 text-slate-300 text-sm">Valor Total</th>
+                        <th className="text-left p-2 text-slate-300 text-sm">Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {items.map((item) => (
+                        <tr key={item.id} className="border-b border-slate-700">
+                          <td className="p-2">
+                            <Input
+                              value={item.item}
+                              onChange={(e) => updateItem(item.id, 'item', e.target.value)}
+                              className="bg-slate-700 border-slate-600 text-slate-100 text-sm"
+                              placeholder="Item"
+                            />
                           </td>
                           <td className="p-2">
-                            <div className="p-2 bg-blue-900 rounded text-blue-100 text-right font-bold">
-                              R$ {getTotalGeral().toFixed(2)}
+                            <Input
+                              value={item.descricao}
+                              onChange={(e) => updateItem(item.id, 'descricao', e.target.value)}
+                              className="bg-slate-700 border-slate-600 text-slate-100 text-sm"
+                              placeholder="Descrição"
+                            />
+                          </td>
+                          <td className="p-2">
+                            <Input
+                              type="number"
+                              value={item.quantidade}
+                              onChange={(e) => updateItem(item.id, 'quantidade', parseFloat(e.target.value) || 0)}
+                              className="bg-slate-700 border-slate-600 text-slate-100 text-sm w-20"
+                              placeholder="0"
+                            />
+                          </td>
+                          <td className="p-2">
+                            <Input
+                              type="number"
+                              step="0.01"
+                              value={item.valorUnitario}
+                              onChange={(e) => updateItem(item.id, 'valorUnitario', parseFloat(e.target.value) || 0)}
+                              className="bg-slate-700 border-slate-600 text-slate-100 text-sm w-24"
+                              placeholder="0,00"
+                            />
+                          </td>
+                          <td className="p-2">
+                            <div className="p-2 bg-slate-700 rounded text-slate-100 text-right text-sm">
+                              R$ {item.valorTotal.toFixed(2)}
                             </div>
                           </td>
-                          <td></td>
+                          <td className="p-2">
+                            <Button
+                              onClick={() => removeItem(item.id)}
+                              size="sm"
+                              variant="destructive"
+                              disabled={items.length === 1}
+                            >
+                              <Minus className="h-4 w-4" />
+                            </Button>
+                          </td>
                         </tr>
-                      </tfoot>
-                    </table>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr className="border-t border-slate-600">
+                        <td colSpan={4} className="p-2 text-right font-bold text-slate-300 text-sm">
+                          TOTAL GERAL:
+                        </td>
+                        <td className="p-2">
+                          <div className="p-2 bg-blue-900 rounded text-blue-100 text-right font-bold text-sm">
+                            R$ {getTotalGeral().toFixed(2)}
+                          </div>
+                        </td>
+                        <td></td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+
+                {/* Cards mobile/tablet */}
+                <div className="lg:hidden space-y-4">
+                  {items.map((item, index) => (
+                    <Card key={item.id} className="bg-slate-700 border-slate-600">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-blue-400 text-base">Item {index + 1}</CardTitle>
+                          <Button
+                            onClick={() => removeItem(item.id)}
+                            size="sm"
+                            variant="destructive"
+                            disabled={items.length === 1}
+                          >
+                            <Minus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div>
+                          <Label className="text-slate-300 text-sm">Nome do Item</Label>
+                          <Input
+                            value={item.item}
+                            onChange={(e) => updateItem(item.id, 'item', e.target.value)}
+                            className="bg-slate-600 border-slate-500 text-slate-100 text-sm mt-1"
+                            placeholder="Digite o nome do item"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-slate-300 text-sm">Descrição</Label>
+                          <Input
+                            value={item.descricao}
+                            onChange={(e) => updateItem(item.id, 'descricao', e.target.value)}
+                            className="bg-slate-600 border-slate-500 text-slate-100 text-sm mt-1"
+                            placeholder="Digite a descrição"
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <Label className="text-slate-300 text-sm">Quantidade</Label>
+                            <Input
+                              type="number"
+                              value={item.quantidade}
+                              onChange={(e) => updateItem(item.id, 'quantidade', parseFloat(e.target.value) || 0)}
+                              className="bg-slate-600 border-slate-500 text-slate-100 text-sm mt-1"
+                              placeholder="0"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-slate-300 text-sm">Valor Unitário</Label>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              value={item.valorUnitario}
+                              onChange={(e) => updateItem(item.id, 'valorUnitario', parseFloat(e.target.value) || 0)}
+                              className="bg-slate-600 border-slate-500 text-slate-100 text-sm mt-1"
+                              placeholder="0,00"
+                            />
+                          </div>
+                        </div>
+                        <div className="bg-slate-600 p-3 rounded">
+                          <div className="flex justify-between items-center">
+                            <span className="text-slate-300 text-sm">Valor Total:</span>
+                            <span className="text-blue-300 font-bold">R$ {item.valorTotal.toFixed(2)}</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                  
+                  {/* Total geral no mobile */}
+                  <Card className="bg-blue-900 border-blue-700">
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-blue-100 font-bold text-lg">TOTAL GERAL:</span>
+                        <span className="text-blue-100 font-bold text-xl">R$ {getTotalGeral().toFixed(2)}</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         ) : (
-          // Pré-visualização
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
+          // Pré-visualização responsiva
+          <div className="space-y-4 sm:space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
               <Button 
                 onClick={() => setShowPreview(false)} 
                 variant="outline"
-                className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                className="border-slate-600 text-slate-300 hover:bg-slate-700 w-full sm:w-auto"
               >
                 ← Voltar ao Formulário
               </Button>
-              <div className="space-x-2">
-                <Button onClick={exportToPDF} className="bg-red-600 hover:bg-red-700">
+              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
+                <Button onClick={exportToPDF} className="bg-red-600 hover:bg-red-700 text-sm">
                   <Download className="mr-2 h-4 w-4" />
                   PDF
                 </Button>
-                <Button onClick={exportToWord} className="bg-blue-600 hover:bg-blue-700">
+                <Button onClick={exportToWord} className="bg-blue-600 hover:bg-blue-700 text-sm">
                   <Download className="mr-2 h-4 w-4" />
                   Word
                 </Button>
-                <Button onClick={exportToExcel} className="bg-green-600 hover:bg-green-700">
+                <Button onClick={exportToExcel} className="bg-green-600 hover:bg-green-700 text-sm">
                   <Download className="mr-2 h-4 w-4" />
                   Excel
                 </Button>
@@ -855,73 +965,102 @@ const Index = () => {
             </div>
 
             <Card className="bg-white text-black max-w-4xl mx-auto">
-              <CardContent className="p-8">
-                {/* Cabeçalho do documento */}
-                <div className="text-center mb-8">
-                  <div className="flex items-center justify-center mb-4">
+              <CardContent className="p-4 sm:p-6 lg:p-8">
+                {/* Cabeçalho do documento responsivo */}
+                <div className="text-center mb-6 sm:mb-8">
+                  <div className="flex flex-col sm:flex-row items-center justify-center mb-4 space-y-2 sm:space-y-0">
                     <img 
                       src="/lovable-uploads/007f16c7-9a20-4239-954a-386da9c3b0b4.png" 
                       alt="Brasão da Prefeitura de Inajá" 
-                      className="h-20 w-20 mr-4"
+                      className="h-16 w-16 sm:h-20 sm:w-20 sm:mr-4"
                     />
-                    <div>
-                      <h1 className="text-xl font-bold">PREFEITURA MUNICIPAL DE INAJÁ</h1>
-                      <p className="text-sm">Av. Antônio Veiga Martins, 80 - CEP: 87670-000</p>
-                      <p className="text-sm">Telefone: (44) 3112-4320</p>
-                      <p className="text-sm">E-mail: prefeito@inaja.pr.gov.br</p>
+                    <div className="text-center sm:text-left">
+                      <h1 className="text-lg sm:text-xl font-bold">PREFEITURA MUNICIPAL DE INAJÁ</h1>
+                      <p className="text-xs sm:text-sm">Av. Antônio Veiga Martins, 80 - CEP: 87670-000</p>
+                      <p className="text-xs sm:text-sm">Telefone: (44) 3112-4320</p>
+                      <p className="text-xs sm:text-sm">E-mail: prefeito@inaja.pr.gov.br</p>
                     </div>
                   </div>
-                  <h2 className="text-lg font-bold mt-6">SOLICITAÇÃO DE FORNECIMENTO</h2>
+                  <h2 className="text-base sm:text-lg font-bold mt-4 sm:mt-6">SOLICITAÇÃO DE FORNECIMENTO</h2>
                 </div>
 
                 {/* Dados do formulário */}
-                <div className="mb-6 space-y-2">
+                <div className="mb-4 sm:mb-6 space-y-1 sm:space-y-2 text-sm sm:text-base">
                   <p><strong>Solicitante:</strong> {formData.nomeSolicitante}</p>
                   <p><strong>Empresa:</strong> {formData.nomeEmpresa}</p>
                   <p><strong>Data:</strong> {formData.dataSolicitacao}</p>
                 </div>
 
-                {/* Tabela de itens */}
-                <table className="w-full border-collapse border border-black mb-6">
-                  <thead>
-                    <tr className="bg-gray-200">
-                      <th className="border border-black p-2 text-left">ITEM</th>
-                      <th className="border border-black p-2 text-left">DESCRIÇÃO</th>
-                      <th className="border border-black p-2 text-center">QTD</th>
-                      <th className="border border-black p-2 text-right">VALOR UNIT.</th>
-                      <th className="border border-black p-2 text-right">VALOR TOTAL</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {items.map((item) => (
-                      <tr key={item.id}>
-                        <td className="border border-black p-2">{item.item}</td>
-                        <td className="border border-black p-2">{item.descricao}</td>
-                        <td className="border border-black p-2 text-center">{item.quantidade}</td>
-                        <td className="border border-black p-2 text-right">R$ {item.valorUnitario.toFixed(2)}</td>
-                        <td className="border border-black p-2 text-right">R$ {item.valorTotal.toFixed(2)}</td>
-                      </tr>
+                {/* Tabela de itens responsiva */}
+                <div className="mb-4 sm:mb-6">
+                  {/* Tabela desktop */}
+                  <div className="hidden sm:block overflow-x-auto">
+                    <table className="w-full border-collapse border border-black text-xs sm:text-sm">
+                      <thead>
+                        <tr className="bg-gray-200">
+                          <th className="border border-black p-1 sm:p-2 text-left">ITEM</th>
+                          <th className="border border-black p-1 sm:p-2 text-left">DESCRIÇÃO</th>
+                          <th className="border border-black p-1 sm:p-2 text-center">QTD</th>
+                          <th className="border border-black p-1 sm:p-2 text-right">VALOR UNIT.</th>
+                          <th className="border border-black p-1 sm:p-2 text-right">VALOR TOTAL</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {items.map((item) => (
+                          <tr key={item.id}>
+                            <td className="border border-black p-1 sm:p-2">{item.item}</td>
+                            <td className="border border-black p-1 sm:p-2">{item.descricao}</td>
+                            <td className="border border-black p-1 sm:p-2 text-center">{item.quantidade}</td>
+                            <td className="border border-black p-1 sm:p-2 text-right">R$ {item.valorUnitario.toFixed(2)}</td>
+                            <td className="border border-black p-1 sm:p-2 text-right">R$ {item.valorTotal.toFixed(2)}</td>
+                          </tr>
+                        ))}
+                        <tr className="bg-gray-100 font-bold">
+                          <td className="border border-black p-1 sm:p-2" colSpan={4}>TOTAL GERAL:</td>
+                          <td className="border border-black p-1 sm:p-2 text-right">R$ {getTotalGeral().toFixed(2)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Cards mobile */}
+                  <div className="sm:hidden space-y-3">
+                    {items.map((item, index) => (
+                      <div key={item.id} className="border border-gray-300 p-3 rounded bg-gray-50">
+                        <div className="space-y-2 text-sm">
+                          <div><strong>Item {index + 1}:</strong> {item.item}</div>
+                          <div><strong>Descrição:</strong> {item.descricao}</div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div><strong>Qtd:</strong> {item.quantidade}</div>
+                            <div><strong>Unit.:</strong> R$ {item.valorUnitario.toFixed(2)}</div>
+                          </div>
+                          <div className="bg-gray-200 p-2 rounded">
+                            <strong>Total: R$ {item.valorTotal.toFixed(2)}</strong>
+                          </div>
+                        </div>
+                      </div>
                     ))}
-                    <tr className="bg-gray-100 font-bold">
-                      <td className="border border-black p-2" colSpan={4}>TOTAL GERAL:</td>
-                      <td className="border border-black p-2 text-right">R$ {getTotalGeral().toFixed(2)}</td>
-                    </tr>
-                  </tbody>
-                </table>
+                    <div className="border-2 border-gray-800 p-3 rounded bg-gray-200">
+                      <div className="text-center font-bold">
+                        TOTAL GERAL: R$ {getTotalGeral().toFixed(2)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 {/* Observações */}
                 {formData.observacoes && (
-                  <div className="mb-8">
+                  <div className="mb-6 sm:mb-8 text-sm sm:text-base">
                     <h3 className="font-bold mb-2">OBSERVAÇÕES:</h3>
-                    <p className="text-justify">{formData.observacoes}</p>
+                    <p className="text-justify break-words">{formData.observacoes}</p>
                   </div>
                 )}
 
                 {/* Espaço para assinatura */}
-                <div className="mt-16 text-center">
-                  <div className="border-b border-black w-80 mx-auto mb-2"></div>
+                <div className="mt-12 sm:mt-16 text-center text-sm sm:text-base">
+                  <div className="border-b border-black w-60 sm:w-80 mx-auto mb-2"></div>
                   <p>Assinatura do Solicitante</p>
-                  <p className="mt-8">Inajá - PR, {format(new Date(), 'dd/MM/yyyy', { locale: ptBR })}</p>
+                  <p className="mt-6 sm:mt-8">Inajá - PR, {format(new Date(), 'dd/MM/yyyy', { locale: ptBR })}</p>
                 </div>
               </CardContent>
             </Card>
