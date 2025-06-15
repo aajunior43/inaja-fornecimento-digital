@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,21 +7,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Download, Eye, Calendar, User, Mail, Phone, MapPin, MessageSquare } from 'lucide-react';
+import { FileText, Download, Eye, Home } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
 
-const Index = () => {
+const Memorandos = () => {
   const [formData, setFormData] = useState({
-    nome: '',
-    email: '',
-    telefone: '',
-    endereco: '',
-    data: '',
-    mensagem: '',
-    prioridade: 'Normal'
+    numero: '',
+    de: '',
+    para: '',
+    assunto: '',
+    conteudo: '',
+    prioridade: 'Normal',
+    observacoes: ''
   });
 
   const [showPreview, setShowPreview] = useState(false);
@@ -48,19 +49,28 @@ const Index = () => {
     doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
     doc.text('PREFEITURA MUNICIPAL', pageWidth / 2, 30, { align: 'center' });
-    doc.text('SOLICITAÇÃO DE SERVIÇO', pageWidth / 2, 45, { align: 'center' });
+    doc.text('MEMORANDO INTERNO', pageWidth / 2, 45, { align: 'center' });
 
     // Separador
     doc.setLineWidth(0.5);
     doc.line(20, 55, pageWidth - 20, 55);
 
-    // Conteúdo da solicitação
+    // Conteúdo do memorando
     doc.setFontSize(12);
     doc.setFont('helvetica', 'normal');
     
     let yPosition = 70;
     const lineHeight = 8;
 
+    doc.text(`MEMORANDO Nº: ${formData.numero || 'N/A'}`, 20, yPosition);
+    yPosition += lineHeight;
+    
+    doc.text(`DE: ${formData.de}`, 20, yPosition);
+    yPosition += lineHeight;
+    
+    doc.text(`PARA: ${formData.para}`, 20, yPosition);
+    yPosition += lineHeight;
+    
     doc.text(`DATA: ${getCurrentDate()}`, 20, yPosition);
     yPosition += lineHeight;
     
@@ -68,78 +78,70 @@ const Index = () => {
     yPosition += lineHeight * 1.5;
 
     doc.setFont('helvetica', 'bold');
-    doc.text(`DADOS DO SOLICITANTE`, 20, yPosition);
+    doc.text(`ASSUNTO: ${formData.assunto}`, 20, yPosition);
     yPosition += lineHeight * 1.5;
 
     doc.setFont('helvetica', 'normal');
-    doc.text(`NOME: ${formData.nome || 'N/A'}`, 20, yPosition);
-    yPosition += lineHeight;
-    
-    doc.text(`EMAIL: ${formData.email}`, 20, yPosition);
-    yPosition += lineHeight;
-    
-    doc.text(`TELEFONE: ${formData.telefone}`, 20, yPosition);
-    yPosition += lineHeight;
-    
-    doc.text(`ENDEREÇO: ${formData.endereco}`, 20, yPosition);
-    yPosition += lineHeight * 1.5;
-
-    doc.setFont('helvetica', 'bold');
-    doc.text(`MENSAGEM:`, 20, yPosition);
-    yPosition += lineHeight * 1.5;
-
-    doc.setFont('helvetica', 'normal');
-    if (formData.mensagem) {
-      const contentLines = doc.splitTextToSize(formData.mensagem, pageWidth - 40);
+    if (formData.conteudo) {
+      const contentLines = doc.splitTextToSize(formData.conteudo, pageWidth - 40);
       doc.text(contentLines, 20, yPosition);
       yPosition += contentLines.length * lineHeight + 10;
     }
 
-    doc.save(`solicitacao_${formData.nome || 'sem_nome'}.pdf`);
+    if (formData.observacoes) {
+      doc.setFont('helvetica', 'bold');
+      doc.text('OBSERVAÇÕES:', 20, yPosition);
+      yPosition += lineHeight;
+      doc.setFont('helvetica', 'normal');
+      const obsLines = doc.splitTextToSize(formData.observacoes, pageWidth - 40);
+      doc.text(obsLines, 20, yPosition);
+    }
+
+    doc.save(`memorando_${formData.numero || 'sem_numero'}.pdf`);
   };
 
   const generateWord = () => {
     const content = `
 PREFEITURA MUNICIPAL
-SOLICITAÇÃO DE SERVIÇO
+MEMORANDO INTERNO
 
+MEMORANDO Nº: ${formData.numero || 'N/A'}
+DE: ${formData.de}
+PARA: ${formData.para}
 DATA: ${getCurrentDate()}
 PRIORIDADE: ${formData.prioridade}
 
-DADOS DO SOLICITANTE
-NOME: ${formData.nome || 'N/A'}
-EMAIL: ${formData.email}
-TELEFONE: ${formData.telefone}
-ENDEREÇO: ${formData.endereco}
+ASSUNTO: ${formData.assunto}
 
-MENSAGEM:
-${formData.mensagem}
+${formData.conteudo}
+
+${formData.observacoes ? `OBSERVAÇÕES:\n${formData.observacoes}` : ''}
     `;
 
     const blob = new Blob([content], { type: 'application/msword' });
-    saveAs(blob, `solicitacao_${formData.nome || 'sem_nome'}.doc`);
+    saveAs(blob, `memorando_${formData.numero || 'sem_numero'}.doc`);
   };
 
   const generateExcel = () => {
     const data = [
-      ['SOLICITAÇÃO DE SERVIÇO'],
+      ['MEMORANDO INTERNO'],
       [''],
+      ['Número', formData.numero || 'N/A'],
+      ['De', formData.de],
+      ['Para', formData.para],
       ['Data', getCurrentDate()],
       ['Prioridade', formData.prioridade],
+      ['Assunto', formData.assunto],
       [''],
-      ['Dados do Solicitante'],
-      ['Nome', formData.nome || 'N/A'],
-      ['Email', formData.email],
-      ['Telefone', formData.telefone],
-      ['Endereço', formData.endereco],
+      ['Conteúdo', formData.conteudo],
       [''],
-      ['Mensagem', formData.mensagem]
+      ['Observações', formData.observacoes]
     ];
 
     const ws = XLSX.utils.aoa_to_sheet(data);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Solicitação');
-    XLSX.writeFile(wb, `solicitacao_${formData.nome || 'sem_nome'}.xlsx`);
+    XLSX.utils.book_append_sheet(wb, ws, 'Memorando');
+    XLSX.writeFile(wb, `memorando_${formData.numero || 'sem_numero'}.xlsx`);
   };
 
   return (
@@ -154,21 +156,18 @@ ${formData.mensagem}
               className="w-16 h-16"
             />
             <div>
-              <h1 className="text-3xl font-bold text-white">Sistema de Solicitações</h1>
+              <h1 className="text-3xl font-bold text-white">Sistema de Memorandos Internos</h1>
               <p className="text-purple-200">Prefeitura Municipal</p>
             </div>
           </div>
           
           <div className="flex items-center justify-center gap-4 mt-6">
-            <Link to="/memorandos">
-              <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg">
-                <MessageSquare className="w-4 h-4 mr-2" />
-                Memorandos Internos
+            <Link to="/">
+              <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+                <Home className="w-4 h-4 mr-2" />
+                Voltar ao Início
               </Button>
             </Link>
-            <Badge variant="outline" className="bg-white/10 border-white/20 text-white">
-              Sistema Ativo
-            </Badge>
           </div>
         </div>
 
@@ -178,19 +177,19 @@ ${formData.mensagem}
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-slate-800">
                 <FileText className="w-5 h-5 text-purple-600" />
-                Dados da Solicitação
+                Dados do Memorando
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium text-slate-700 mb-2 block">
-                    Nome Completo
+                    Número do Memorando
                   </label>
                   <Input
-                    placeholder="Seu nome"
-                    value={formData.nome}
-                    onChange={(e) => handleInputChange('nome', e.target.value)}
+                    placeholder="Ex: 001/2024"
+                    value={formData.numero}
+                    onChange={(e) => handleInputChange('numero', e.target.value)}
                     className="border-slate-300"
                   />
                 </div>
@@ -213,51 +212,61 @@ ${formData.mensagem}
 
               <div>
                 <label className="text-sm font-medium text-slate-700 mb-2 block">
-                  Email
+                  De (Remetente/Setor)
                 </label>
                 <Input
-                  placeholder="seuemail@email.com"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  placeholder="Ex: Secretaria de Administração"
+                  value={formData.de}
+                  onChange={(e) => handleInputChange('de', e.target.value)}
                   className="border-slate-300"
                 />
               </div>
 
               <div>
                 <label className="text-sm font-medium text-slate-700 mb-2 block">
-                  Telefone
+                  Para (Destinatário/Setor)
                 </label>
                 <Input
-                  placeholder="(99) 99999-9999"
-                  type="tel"
-                  value={formData.telefone}
-                  onChange={(e) => handleInputChange('telefone', e.target.value)}
+                  placeholder="Ex: Secretaria de Obras"
+                  value={formData.para}
+                  onChange={(e) => handleInputChange('para', e.target.value)}
                   className="border-slate-300"
                 />
               </div>
 
               <div>
                 <label className="text-sm font-medium text-slate-700 mb-2 block">
-                  Endereço
+                  Assunto
                 </label>
                 <Input
-                  placeholder="Rua, número, bairro, cidade - UF"
-                  value={formData.endereco}
-                  onChange={(e) => handleInputChange('endereco', e.target.value)}
+                  placeholder="Assunto do memorando"
+                  value={formData.assunto}
+                  onChange={(e) => handleInputChange('assunto', e.target.value)}
                   className="border-slate-300"
                 />
               </div>
 
               <div>
                 <label className="text-sm font-medium text-slate-700 mb-2 block">
-                  Mensagem
+                  Conteúdo do Memorando
                 </label>
                 <Textarea
-                  placeholder="Descreva sua solicitação..."
-                  value={formData.mensagem}
-                  onChange={(e) => handleInputChange('mensagem', e.target.value)}
+                  placeholder="Digite o conteúdo do memorando..."
+                  value={formData.conteudo}
+                  onChange={(e) => handleInputChange('conteudo', e.target.value)}
                   className="border-slate-300 min-h-32"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-slate-700 mb-2 block">
+                  Observações (Opcional)
+                </label>
+                <Textarea
+                  placeholder="Observações adicionais..."
+                  value={formData.observacoes}
+                  onChange={(e) => handleInputChange('observacoes', e.target.value)}
+                  className="border-slate-300 min-h-20"
                 />
               </div>
             </CardContent>
@@ -287,10 +296,13 @@ ${formData.mensagem}
                   <div className="bg-white p-6 border rounded-lg text-sm">
                     <div className="text-center mb-6">
                       <h3 className="font-bold text-lg">PREFEITURA MUNICIPAL</h3>
-                      <h4 className="font-bold">SOLICITAÇÃO DE SERVIÇO</h4>
+                      <h4 className="font-bold">MEMORANDO INTERNO</h4>
                     </div>
                     
                     <div className="space-y-2 mb-4">
+                      <p><strong>MEMORANDO Nº:</strong> {formData.numero || 'N/A'}</p>
+                      <p><strong>DE:</strong> {formData.de || 'N/A'}</p>
+                      <p><strong>PARA:</strong> {formData.para || 'N/A'}</p>
                       <p><strong>DATA:</strong> {getCurrentDate()}</p>
                       <p><strong>PRIORIDADE:</strong> <Badge variant={formData.prioridade === 'Muito Urgente' ? 'destructive' : formData.prioridade === 'Urgente' ? 'default' : 'secondary'}>{formData.prioridade}</Badge></p>
                     </div>
@@ -298,16 +310,19 @@ ${formData.mensagem}
                     <Separator className="my-4" />
 
                     <div className="mb-4">
-                      <p><strong>DADOS DO SOLICITANTE</strong></p>
-                      <p><strong>NOME:</strong> {formData.nome || 'N/A'}</p>
-                      <p><strong>EMAIL:</strong> {formData.email || 'N/A'}</p>
-                      <p><strong>TELEFONE:</strong> {formData.telefone || 'N/A'}</p>
-                      <p><strong>ENDEREÇO:</strong> {formData.endereco || 'N/A'}</p>
+                      <p><strong>ASSUNTO:</strong> {formData.assunto || 'N/A'}</p>
                     </div>
 
                     <div className="mb-4">
-                      <p className="whitespace-pre-wrap">{formData.mensagem || 'Mensagem do solicitante...'}</p>
+                      <p className="whitespace-pre-wrap">{formData.conteudo || 'Conteúdo do memorando...'}</p>
                     </div>
+
+                    {formData.observacoes && (
+                      <div>
+                        <p><strong>OBSERVAÇÕES:</strong></p>
+                        <p className="whitespace-pre-wrap">{formData.observacoes}</p>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               )}
@@ -317,7 +332,7 @@ ${formData.mensagem}
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-slate-800">
                   <Download className="w-5 h-5 text-purple-600" />
-                  Exportar Solicitação
+                  Exportar Memorando
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -325,7 +340,7 @@ ${formData.mensagem}
                   <Button
                     onClick={generatePDF}
                     className="bg-red-600 hover:bg-red-700 text-white justify-start"
-                    disabled={!formData.nome || !formData.email || !formData.telefone || !formData.endereco}
+                    disabled={!formData.de || !formData.para || !formData.assunto}
                   >
                     <FileText className="w-4 h-4 mr-2" />
                     Baixar PDF
@@ -333,7 +348,7 @@ ${formData.mensagem}
                   <Button
                     onClick={generateWord}
                     className="bg-blue-600 hover:bg-blue-700 text-white justify-start"
-                    disabled={!formData.nome || !formData.email || !formData.telefone || !formData.endereco}
+                    disabled={!formData.de || !formData.para || !formData.assunto}
                   >
                     <FileText className="w-4 h-4 mr-2" />
                     Baixar Word
@@ -341,16 +356,16 @@ ${formData.mensagem}
                   <Button
                     onClick={generateExcel}
                     className="bg-green-600 hover:bg-green-700 text-white justify-start"
-                    disabled={!formData.nome || !formData.email || !formData.telefone || !formData.endereco}
+                    disabled={!formData.de || !formData.para || !formData.assunto}
                   >
                     <FileText className="w-4 h-4 mr-2" />
                     Baixar Excel
                   </Button>
                 </div>
                 
-                {(!formData.nome || !formData.email || !formData.telefone || !formData.endereco) && (
+                {(!formData.de || !formData.para || !formData.assunto) && (
                   <p className="text-sm text-slate-500 mt-3">
-                    Preencha todos os campos para habilitar a exportação
+                    Preencha os campos obrigatórios para habilitar a exportação
                   </p>
                 )}
               </CardContent>
@@ -362,4 +377,4 @@ ${formData.mensagem}
   );
 };
 
-export default Index;
+export default Memorandos;
