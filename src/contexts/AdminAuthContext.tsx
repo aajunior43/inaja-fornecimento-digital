@@ -19,7 +19,7 @@ export const useAdminAuth = () => {
 };
 
 // Senha padrão para desenvolvimento - em produção, isso deveria vir de um backend seguro
-const ADMIN_PASSWORD = 'admin123';
+const ADMIN_PASSWORD = 'Jr19991020.';
 const AUTH_KEY = 'admin_authenticated';
 
 export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({
