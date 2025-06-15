@@ -53,23 +53,26 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="max-w-6xl mx-auto space-y-6">
-        <FormHeader formData={formData} setFormData={setFormData} />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4 md:p-6">
+      <div className="max-w-7xl mx-auto space-y-8">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+          <FormHeader formData={formData} setFormData={setFormData} />
+        </div>
         
-        <Separator className="my-6" />
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+          <ItemsTable items={items} setItems={setItems} />
+        </div>
         
-        <ItemsTable items={items} setItems={setItems} />
-        
-        <Separator className="my-6" />
-        
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <ExportActions 
-            formData={formData}
-            items={items}
-            setShowPreview={setShowPreview}
-            clearForm={clearForm}
-          />
+        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl shadow-xl p-6 text-white">
+          <div className="flex flex-col items-center space-y-4">
+            <h3 className="text-lg font-semibold">Ações do Documento</h3>
+            <ExportActions 
+              formData={formData}
+              items={items}
+              setShowPreview={setShowPreview}
+              clearForm={clearForm}
+            />
+          </div>
         </div>
       </div>
     </div>
