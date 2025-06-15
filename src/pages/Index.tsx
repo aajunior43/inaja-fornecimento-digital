@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { Plus, Minus, FileText, Download, Trash2, Eye, Menu, Building2, User, Calendar, FileEdit, Shield } from "lucide-react";
+import { Plus, Minus, FileText, Download, Trash2, Eye, Menu, Building2, User, Calendar, FileEdit } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
@@ -33,6 +33,7 @@ interface FormData {
 
 const Index = () => {
   const navigate = useNavigate();
+  
   const [formData, setFormData] = useState<FormData>({
     nomeSolicitante: '',
     nomeEmpresa: '',
