@@ -26,17 +26,22 @@ const FormHeader = ({ formData, setFormData }: FormHeaderProps) => {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="text-center text-blue-800">
+      <CardHeader className="text-center">
+        <div className="flex justify-center mb-4">
+          <img 
+            src="/lovable-uploads/007f16c7-9a20-4239-954a-386da9c3b0b4.png" 
+            alt="Prefeitura de Inajá" 
+            className="h-20 w-auto"
+          />
+        </div>
+        <CardTitle className="text-blue-800 text-xl">
           PREFEITURA MUNICIPAL DE INAJÁ
         </CardTitle>
-        <p className="text-center text-sm text-gray-600">
-          Av. Antônio Veiga Martins, 80 - CEP: 87670-000
-        </p>
-        <p className="text-center text-sm text-gray-600">
-          Telefone: (44) 3112-4320 | E-mail: prefeito@inaja.pr.gov.br
-        </p>
-        <h2 className="text-center text-lg font-semibold mt-4">
+        <div className="space-y-1 text-sm text-gray-600">
+          <p>Av. Antônio Veiga Martins, 80 - CEP: 87670-000</p>
+          <p>Telefone: (44) 3112-4320 | E-mail: prefeito@inaja.pr.gov.br</p>
+        </div>
+        <h2 className="text-lg font-semibold mt-4 text-gray-800">
           SOLICITAÇÃO DE FORNECIMENTO
         </h2>
       </CardHeader>
