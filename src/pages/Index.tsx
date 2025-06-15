@@ -11,7 +11,7 @@ import { ptBR } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
 import jsPDF from 'jspdf';
 import * as XLSX from 'xlsx';
-import { Document, Packer, Paragraph, Table, TableCell, TableRow, WidthType, AlignmentType, HeadingLevel } from 'docx';
+import { Document, Packer, Paragraph, Table, TableCell, TableRow, WidthType, AlignmentType, HeadingLevel, BorderStyle } from 'docx';
 
 interface Item {
   id: string;
@@ -159,43 +159,64 @@ const Index = () => {
       doc.text(`Empresa: ${formData.nomeEmpresa}`, 20, 87);
       doc.text(`Data: ${formData.dataSolicitacao}`, 20, 94);
       
-      // Tabela de itens
+      // Tabela de itens com bordas
       let yPosition = 110;
+      
+      // Cabeçalho da tabela
       doc.setFont("helvetica", "bold");
-      doc.text("ITEM", 20, yPosition);
-      doc.text("DESCRIÇÃO", 40, yPosition);
-      doc.text("QTD", 120, yPosition);
-      doc.text("VALOR UNIT.", 140, yPosition);
-      doc.text("VALOR TOTAL", 170, yPosition);
+      doc.setFontSize(9);
       
-      yPosition += 7;
-      doc.line(20, yPosition, 190, yPosition);
-      yPosition += 5;
+      // Desenhar bordas do cabeçalho
+      doc.rect(20, yPosition - 5, 20, 10); // ITEM
+      doc.rect(40, yPosition - 5, 60, 10); // DESCRIÇÃO
+      doc.rect(100, yPosition - 5, 20, 10); // QTD
+      doc.rect(120, yPosition - 5, 30, 10); // VALOR UNIT.
+      doc.rect(150, yPosition - 5, 30, 10); // VALOR TOTAL
       
+      // Texto do cabeçalho
+      doc.text("ITEM", 22, yPosition);
+      doc.text("DESCRIÇÃO", 42, yPosition);
+      doc.text("QTD", 102, yPosition);
+      doc.text("VALOR UNIT.", 122, yPosition);
+      doc.text("VALOR TOTAL", 152, yPosition);
+      
+      yPosition += 10;
+      
+      // Itens da tabela
       doc.setFont("helvetica", "normal");
       items.forEach((item) => {
         if (yPosition > 250) {
           doc.addPage();
           yPosition = 20;
         }
-        doc.text(item.item, 20, yPosition);
-        doc.text(item.descricao.substring(0, 30), 40, yPosition);
-        doc.text(item.quantidade.toString(), 120, yPosition);
-        doc.text(`R$ ${item.valorUnitario.toFixed(2)}`, 140, yPosition);
-        doc.text(`R$ ${item.valorTotal.toFixed(2)}`, 170, yPosition);
-        yPosition += 7;
+        
+        // Desenhar bordas das células
+        doc.rect(20, yPosition - 5, 20, 10); // ITEM
+        doc.rect(40, yPosition - 5, 60, 10); // DESCRIÇÃO
+        doc.rect(100, yPosition - 5, 20, 10); // QTD
+        doc.rect(120, yPosition - 5, 30, 10); // VALOR UNIT.
+        doc.rect(150, yPosition - 5, 30, 10); // VALOR TOTAL
+        
+        // Texto das células
+        doc.text(item.item.substring(0, 15), 22, yPosition);
+        doc.text(item.descricao.substring(0, 40), 42, yPosition);
+        doc.text(item.quantidade.toString(), 102, yPosition);
+        doc.text(`R$ ${item.valorUnitario.toFixed(2)}`, 122, yPosition);
+        doc.text(`R$ ${item.valorTotal.toFixed(2)}`, 152, yPosition);
+        yPosition += 10;
       });
       
-      // Total geral
-      yPosition += 5;
-      doc.line(20, yPosition, 190, yPosition);
-      yPosition += 7;
+      // Total geral com borda
       doc.setFont("helvetica", "bold");
-      doc.text(`TOTAL GERAL: R$ ${getTotalGeral().toFixed(2)}`, 170, yPosition, { align: "right" });
+      doc.rect(20, yPosition - 5, 130, 10); // Célula do texto "TOTAL GERAL"
+      doc.rect(150, yPosition - 5, 30, 10); // Célula do valor total
+      
+      doc.text("TOTAL GERAL:", 22, yPosition);
+      doc.text(`R$ ${getTotalGeral().toFixed(2)}`, 152, yPosition);
       
       // Observações
       if (formData.observacoes) {
-        yPosition += 15;
+        yPosition += 20;
         doc.setFont("helvetica", "bold");
         doc.text("OBSERVAÇÕES:", 20, yPosition);
         yPosition += 7;
@@ -299,32 +320,160 @@ const Index = () => {
               size: 100,
               type: WidthType.PERCENTAGE,
             },
+            borders: {
+              top: { style: BorderStyle.SINGLE, size: 1 },
+              bottom: { style: BorderStyle.SINGLE, size: 1 },
+              left: { style: BorderStyle.SINGLE, size: 1 },
+              right: { style: BorderStyle.SINGLE, size: 1 },
+              insideHorizontal: { style: BorderStyle.SINGLE, size: 1 },
+              insideVertical: { style: BorderStyle.SINGLE, size: 1 },
+            },
             rows: [
               new TableRow({
                 children: [
-                  new TableCell({ children: [new Paragraph("ITEM")] }),
-                  new TableCell({ children: [new Paragraph("DESCRIÇÃO")] }),
-                  new TableCell({ children: [new Paragraph("QTD")] }),
-                  new TableCell({ children: [new Paragraph("VALOR UNIT.")] }),
-                  new TableCell({ children: [new Paragraph("VALOR TOTAL")] }),
+                  new TableCell({ 
+                    children: [new Paragraph("ITEM")],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
+                  new TableCell({ 
+                    children: [new Paragraph("DESCRIÇÃO")],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
+                  new TableCell({ 
+                    children: [new Paragraph("QTD")],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
+                  new TableCell({ 
+                    children: [new Paragraph("VALOR UNIT.")],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
+                  new TableCell({ 
+                    children: [new Paragraph("VALOR TOTAL")],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
                 ],
               }),
               ...items.map(item => new TableRow({
                 children: [
-                  new TableCell({ children: [new Paragraph(item.item)] }),
-                  new TableCell({ children: [new Paragraph(item.descricao)] }),
-                  new TableCell({ children: [new Paragraph(item.quantidade.toString())] }),
-                  new TableCell({ children: [new Paragraph(`R$ ${item.valorUnitario.toFixed(2)}`)] }),
-                  new TableCell({ children: [new Paragraph(`R$ ${item.valorTotal.toFixed(2)}`)] }),
+                  new TableCell({ 
+                    children: [new Paragraph(item.item)],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
+                  new TableCell({ 
+                    children: [new Paragraph(item.descricao)],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
+                  new TableCell({ 
+                    children: [new Paragraph(item.quantidade.toString())],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
+                  new TableCell({ 
+                    children: [new Paragraph(`R$ ${item.valorUnitario.toFixed(2)}`)],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
+                  new TableCell({ 
+                    children: [new Paragraph(`R$ ${item.valorTotal.toFixed(2)}`)],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
                 ],
               })),
               new TableRow({
                 children: [
-                  new TableCell({ children: [new Paragraph("")] }),
-                  new TableCell({ children: [new Paragraph("")] }),
-                  new TableCell({ children: [new Paragraph("")] }),
-                  new TableCell({ children: [new Paragraph("TOTAL GERAL:")] }),
-                  new TableCell({ children: [new Paragraph(`R$ ${getTotalGeral().toFixed(2)}`)] }),
+                  new TableCell({ 
+                    children: [new Paragraph("")],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
+                  new TableCell({ 
+                    children: [new Paragraph("")],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
+                  new TableCell({ 
+                    children: [new Paragraph("")],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
+                  new TableCell({ 
+                    children: [new Paragraph("TOTAL GERAL:")],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
+                  new TableCell({ 
+                    children: [new Paragraph(`R$ ${getTotalGeral().toFixed(2)}`)],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
                 ],
               }),
             ],
