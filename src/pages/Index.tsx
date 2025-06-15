@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { Plus, Minus, FileText, Download, Trash2, Eye, Menu } from "lucide-react";
+import { Plus, Minus, FileText, Download, Trash2, Eye, Menu, Building2, User, Calendar, FileEdit } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
@@ -603,87 +604,101 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-2 sm:p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900 text-slate-100 p-2 sm:p-4">
       <div className="max-w-7xl mx-auto">
-        {/* Header - Melhorado para mobile */}
-        <div className="text-center mb-6 sm:mb-8">
-          <div className="flex flex-col sm:flex-row items-center justify-center mb-4 space-y-2 sm:space-y-0">
-            <img 
-              src="/lovable-uploads/007f16c7-9a20-4239-954a-386da9c3b0b4.png" 
-              alt="Brasão da Prefeitura de Inajá" 
-              className="h-12 w-12 sm:h-16 sm:w-16 sm:mr-4"
-            />
-            <div className="text-center sm:text-left">
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-400">
-                Sistema de Solicitação de Fornecimento
-              </h1>
-              <p className="text-slate-400 text-sm sm:text-base">Prefeitura Municipal de Inajá - PR</p>
+        {/* Enhanced Header */}
+        <div className="text-center mb-6 sm:mb-8 relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-2xl blur-xl"></div>
+          <div className="relative bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 shadow-2xl">
+            <div className="flex flex-col sm:flex-row items-center justify-center mb-4 space-y-4 sm:space-y-0">
+              <div className="relative">
+                <div className="absolute inset-0 bg-blue-500/30 rounded-full blur-lg"></div>
+                <img 
+                  src="/lovable-uploads/007f16c7-9a20-4239-954a-386da9c3b0b4.png" 
+                  alt="Brasão da Prefeitura de Inajá" 
+                  className="relative h-16 w-16 sm:h-20 sm:w-20 sm:mr-6 drop-shadow-lg"
+                />
+              </div>
+              <div className="text-center sm:text-left">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">
+                  Sistema de Solicitação de Fornecimento
+                </h1>
+                <p className="text-slate-300 text-sm sm:text-base flex items-center justify-center sm:justify-start">
+                  <Building2 className="w-4 h-4 mr-2 text-blue-400" />
+                  Prefeitura Municipal de Inajá - PR
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
         {!showPreview ? (
           <div className="space-y-6">
-            {/* Layout responsivo - Stack no mobile, grid no desktop */}
+            {/* Enhanced Layout */}
             <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
-              {/* Formulário Principal */}
+              {/* Enhanced Main Form */}
               <div className="xl:col-span-3">
-                <Card className="bg-slate-800 border-slate-700">
-                  <CardHeader>
+                <Card className="bg-slate-800/80 backdrop-blur-sm border-slate-700/50 shadow-2xl overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-purple-600/5"></div>
+                  <CardHeader className="relative border-b border-slate-700/50 bg-slate-800/50">
                     <CardTitle className="text-blue-400 flex items-center text-lg sm:text-xl">
-                      <FileText className="mr-2 h-5 w-5" />
+                      <FileText className="mr-3 h-6 w-6 text-blue-400" />
                       Dados da Solicitação
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="solicitante" className="text-slate-300 text-sm sm:text-base">
+                  <CardContent className="relative space-y-6 p-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="solicitante" className="text-slate-300 text-sm sm:text-base flex items-center">
+                          <User className="w-4 h-4 mr-2 text-blue-400" />
                           Nome do Solicitante
                         </Label>
                         <Input
                           id="solicitante"
                           value={formData.nomeSolicitante}
                           onChange={(e) => setFormData({ ...formData, nomeSolicitante: e.target.value })}
-                          className="bg-slate-700 border-slate-600 text-slate-100 text-sm sm:text-base"
+                          className="bg-slate-700/80 border-slate-600/50 text-slate-100 text-sm sm:text-base focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200"
                           placeholder="Digite o nome do solicitante"
                         />
                       </div>
-                      <div>
-                        <Label htmlFor="empresa" className="text-slate-300 text-sm sm:text-base">
+                      <div className="space-y-2">
+                        <Label htmlFor="empresa" className="text-slate-300 text-sm sm:text-base flex items-center">
+                          <Building2 className="w-4 h-4 mr-2 text-blue-400" />
                           Nome da Empresa
                         </Label>
                         <Input
                           id="empresa"
                           value={formData.nomeEmpresa}
                           onChange={(e) => setFormData({ ...formData, nomeEmpresa: e.target.value })}
-                          className="bg-slate-700 border-slate-600 text-slate-100 text-sm sm:text-base"
+                          className="bg-slate-700/80 border-slate-600/50 text-slate-100 text-sm sm:text-base focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200"
                           placeholder="Digite o nome da empresa"
                         />
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="data" className="text-slate-300 text-sm sm:text-base">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="data" className="text-slate-300 text-sm sm:text-base flex items-center">
+                          <Calendar className="w-4 h-4 mr-2 text-blue-400" />
                           Data da Solicitação
                         </Label>
                         <Input
                           id="data"
                           value={formData.dataSolicitacao}
                           onChange={(e) => setFormData({ ...formData, dataSolicitacao: e.target.value })}
-                          className="bg-slate-700 border-slate-600 text-slate-100 text-sm sm:text-base"
+                          className="bg-slate-700/80 border-slate-600/50 text-slate-100 text-sm sm:text-base focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200"
                         />
                       </div>
                     </div>
-                    <div>
-                      <Label htmlFor="observacoes" className="text-slate-300 text-sm sm:text-base">
+                    <div className="space-y-2">
+                      <Label htmlFor="observacoes" className="text-slate-300 text-sm sm:text-base flex items-center">
+                        <FileEdit className="w-4 h-4 mr-2 text-blue-400" />
                         Observações Gerais
                       </Label>
                       <Textarea
                         id="observacoes"
                         value={formData.observacoes}
                         onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
-                        className="bg-slate-700 border-slate-600 text-slate-100 min-h-[80px] sm:min-h-[100px] text-sm sm:text-base"
+                        className="bg-slate-700/80 border-slate-600/50 text-slate-100 min-h-[100px] sm:min-h-[120px] text-sm sm:text-base focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200 resize-none"
                         placeholder="Digite observações adicionais..."
                       />
                     </div>
@@ -691,35 +706,39 @@ const Index = () => {
                 </Card>
               </div>
 
-              {/* Ações - Menu collapsible no mobile */}
+              {/* Enhanced Actions Panel */}
               <div className="xl:col-span-1">
-                <Card className="bg-slate-800 border-slate-700">
-                  <CardHeader className="pb-3">
+                <Card className="bg-slate-800/80 backdrop-blur-sm border-slate-700/50 shadow-2xl overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-600/5 to-pink-600/5"></div>
+                  <CardHeader className="relative pb-3 border-b border-slate-700/50 bg-slate-800/50">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-blue-400 text-lg">Ações</CardTitle>
+                      <CardTitle className="text-purple-400 text-lg flex items-center">
+                        <Menu className="mr-2 h-5 w-5" />
+                        Ações
+                      </CardTitle>
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="xl:hidden"
+                        className="xl:hidden text-purple-400 hover:text-purple-300 hover:bg-purple-900/20"
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                       >
                         <Menu className="h-4 w-4" />
                       </Button>
                     </div>
                   </CardHeader>
-                  <CardContent className={`space-y-3 ${isMobileMenuOpen ? 'block' : 'hidden xl:block'}`}>
+                  <CardContent className={`relative space-y-3 p-4 ${isMobileMenuOpen ? 'block' : 'hidden xl:block'}`}>
                     <Button 
                       onClick={() => setShowPreview(true)} 
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-sm sm:text-base"
+                      className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                       size="sm"
                     >
                       <Eye className="mr-2 h-4 w-4" />
                       Visualizar
                     </Button>
-                    <Separator className="bg-slate-600" />
+                    <Separator className="bg-gradient-to-r from-slate-600/50 to-slate-500/50" />
                     <Button 
                       onClick={exportToPDF} 
-                      className="w-full bg-red-600 hover:bg-red-700 text-sm sm:text-base"
+                      className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                       size="sm"
                     >
                       <Download className="mr-2 h-4 w-4" />
@@ -727,7 +746,7 @@ const Index = () => {
                     </Button>
                     <Button 
                       onClick={exportToWord} 
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-sm sm:text-base"
+                      className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                       size="sm"
                     >
                       <Download className="mr-2 h-4 w-4" />
@@ -735,17 +754,17 @@ const Index = () => {
                     </Button>
                     <Button 
                       onClick={exportToExcel} 
-                      className="w-full bg-green-600 hover:bg-green-700 text-sm sm:text-base"
+                      className="w-full bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                       size="sm"
                     >
                       <Download className="mr-2 h-4 w-4" />
                       Exportar Excel
                     </Button>
-                    <Separator className="bg-slate-600" />
+                    <Separator className="bg-gradient-to-r from-slate-600/50 to-slate-500/50" />
                     <Button 
                       onClick={clearForm} 
                       variant="destructive" 
-                      className="w-full text-sm sm:text-base"
+                      className="w-full text-sm sm:text-base bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                       size="sm"
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
@@ -756,82 +775,87 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Tabela de Itens - Completamente responsiva */}
-            <Card className="bg-slate-800 border-slate-700">
-              <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0">
-                <CardTitle className="text-blue-400 text-lg sm:text-xl">Itens da Solicitação</CardTitle>
+            {/* Enhanced Items Table */}
+            <Card className="bg-slate-800/80 backdrop-blur-sm border-slate-700/50 shadow-2xl overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-green-600/5 to-teal-600/5"></div>
+              <CardHeader className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0 border-b border-slate-700/50 bg-slate-800/50">
+                <CardTitle className="text-green-400 text-lg sm:text-xl flex items-center">
+                  <FileText className="mr-3 h-6 w-6" />
+                  Itens da Solicitação
+                </CardTitle>
                 <Button 
                   onClick={addItem} 
                   size="sm" 
-                  className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
+                  className="bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 w-full sm:w-auto shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                 >
-                  <Plus className="h-4 w-4 mr-1" />
+                  <Plus className="h-4 w-4 mr-2" />
                   Adicionar Item
                 </Button>
               </CardHeader>
-              <CardContent>
-                {/* Tabela desktop */}
+              <CardContent className="relative p-0">
+                {/* Desktop Table */}
                 <div className="hidden lg:block overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-slate-600">
-                        <th className="text-left p-2 text-slate-300 text-sm">Item</th>
-                        <th className="text-left p-2 text-slate-300 text-sm">Descrição</th>
-                        <th className="text-left p-2 text-slate-300 text-sm">Qtd</th>
-                        <th className="text-left p-2 text-slate-300 text-sm">Valor Unit.</th>
-                        <th className="text-left p-2 text-slate-300 text-sm">Valor Total</th>
-                        <th className="text-left p-2 text-slate-300 text-sm">Ações</th>
+                      <tr className="border-b border-slate-700/50 bg-slate-700/30">
+                        <th className="text-left p-4 text-slate-300 text-sm font-semibold">Item</th>
+                        <th className="text-left p-4 text-slate-300 text-sm font-semibold">Descrição</th>
+                        <th className="text-left p-4 text-slate-300 text-sm font-semibold">Qtd</th>
+                        <th className="text-left p-4 text-slate-300 text-sm font-semibold">Valor Unit.</th>
+                        <th className="text-left p-4 text-slate-300 text-sm font-semibold">Valor Total</th>
+                        <th className="text-left p-4 text-slate-300 text-sm font-semibold">Ações</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {items.map((item) => (
-                        <tr key={item.id} className="border-b border-slate-700">
-                          <td className="p-2">
+                      {items.map((item, index) => (
+                        <tr key={item.id} className={`border-b border-slate-700/30 hover:bg-slate-700/20 transition-colors duration-200 ${index % 2 === 0 ? 'bg-slate-800/30' : 'bg-slate-800/10'}`}>
+                          <td className="p-4">
                             <Input
                               value={item.item}
                               onChange={(e) => updateItem(item.id, 'item', e.target.value)}
-                              className="bg-slate-700 border-slate-600 text-slate-100 text-sm"
+                              className="bg-slate-700/80 border-slate-600/50 text-slate-100 text-sm focus:border-green-400 focus:ring-green-400/20 transition-all duration-200"
                               placeholder="Item"
                             />
                           </td>
-                          <td className="p-2">
+                          <td className="p-4">
                             <Input
                               value={item.descricao}
                               onChange={(e) => updateItem(item.id, 'descricao', e.target.value)}
-                              className="bg-slate-700 border-slate-600 text-slate-100 text-sm"
+                              className="bg-slate-700/80 border-slate-600/50 text-slate-100 text-sm focus:border-green-400 focus:ring-green-400/20 transition-all duration-200"
                               placeholder="Descrição"
                             />
                           </td>
-                          <td className="p-2">
+                          <td className="p-4">
                             <Input
                               type="number"
                               value={item.quantidade}
                               onChange={(e) => updateItem(item.id, 'quantidade', parseFloat(e.target.value) || 0)}
-                              className="bg-slate-700 border-slate-600 text-slate-100 text-sm w-20"
+                              className="bg-slate-700/80 border-slate-600/50 text-slate-100 text-sm w-20 focus:border-green-400 focus:ring-green-400/20 transition-all duration-200"
                               placeholder="0"
                             />
                           </td>
-                          <td className="p-2">
+                          <td className="p-4">
                             <Input
                               type="number"
                               step="0.01"
                               value={item.valorUnitario}
                               onChange={(e) => updateItem(item.id, 'valorUnitario', parseFloat(e.target.value) || 0)}
-                              className="bg-slate-700 border-slate-600 text-slate-100 text-sm w-24"
+                              className="bg-slate-700/80 border-slate-600/50 text-slate-100 text-sm w-28 focus:border-green-400 focus:ring-green-400/20 transition-all duration-200"
                               placeholder="0,00"
                             />
                           </td>
-                          <td className="p-2">
-                            <div className="p-2 bg-slate-700 rounded text-slate-100 text-right text-sm">
+                          <td className="p-4">
+                            <div className="p-3 bg-gradient-to-r from-slate-700/80 to-slate-600/80 rounded-md text-slate-100 text-right text-sm font-semibold shadow-inner">
                               R$ {item.valorTotal.toFixed(2)}
                             </div>
                           </td>
-                          <td className="p-2">
+                          <td className="p-4">
                             <Button
                               onClick={() => removeItem(item.id)}
                               size="sm"
                               variant="destructive"
                               disabled={items.length === 1}
+                              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed"
                             >
                               <Minus className="h-4 w-4" />
                             </Button>
@@ -840,12 +864,12 @@ const Index = () => {
                       ))}
                     </tbody>
                     <tfoot>
-                      <tr className="border-t border-slate-600">
-                        <td colSpan={4} className="p-2 text-right font-bold text-slate-300 text-sm">
+                      <tr className="border-t-2 border-slate-600 bg-gradient-to-r from-blue-900/50 to-purple-900/50">
+                        <td colSpan={4} className="p-4 text-right font-bold text-slate-200 text-base">
                           TOTAL GERAL:
                         </td>
-                        <td className="p-2">
-                          <div className="p-2 bg-blue-900 rounded text-blue-100 text-right font-bold text-sm">
+                        <td className="p-4">
+                          <div className="p-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-md text-white text-right font-bold text-base shadow-lg">
                             R$ {getTotalGeral().toFixed(2)}
                           </div>
                         </td>
@@ -855,81 +879,93 @@ const Index = () => {
                   </table>
                 </div>
 
-                {/* Cards mobile/tablet */}
-                <div className="lg:hidden space-y-4">
+                {/* Enhanced Mobile Cards */}
+                <div className="lg:hidden space-y-4 p-4">
                   {items.map((item, index) => (
-                    <Card key={item.id} className="bg-slate-700 border-slate-600">
-                      <CardHeader className="pb-3">
+                    <Card key={item.id} className="bg-slate-700/60 backdrop-blur-sm border-slate-600/50 shadow-xl overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-purple-600/5"></div>
+                      <CardHeader className="relative pb-3 border-b border-slate-600/50">
                         <div className="flex items-center justify-between">
-                          <CardTitle className="text-blue-400 text-base">Item {index + 1}</CardTitle>
+                          <CardTitle className="text-blue-400 text-base flex items-center">
+                            <FileText className="w-4 h-4 mr-2" />
+                            Item {index + 1}
+                          </CardTitle>
                           <Button
                             onClick={() => removeItem(item.id)}
                             size="sm"
                             variant="destructive"
                             disabled={items.length === 1}
+                            className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-30"
                           >
                             <Minus className="h-4 w-4" />
                           </Button>
                         </div>
                       </CardHeader>
-                      <CardContent className="space-y-3">
-                        <div>
-                          <Label className="text-slate-300 text-sm">Nome do Item</Label>
+                      <CardContent className="relative space-y-4 p-4">
+                        <div className="space-y-2">
+                          <Label className="text-slate-300 text-sm flex items-center">
+                            <FileText className="w-3 h-3 mr-2 text-blue-400" />
+                            Nome do Item
+                          </Label>
                           <Input
                             value={item.item}
                             onChange={(e) => updateItem(item.id, 'item', e.target.value)}
-                            className="bg-slate-600 border-slate-500 text-slate-100 text-sm mt-1"
+                            className="bg-slate-600/80 border-slate-500/50 text-slate-100 text-sm focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200"
                             placeholder="Digite o nome do item"
                           />
                         </div>
-                        <div>
-                          <Label className="text-slate-300 text-sm">Descrição</Label>
+                        <div className="space-y-2">
+                          <Label className="text-slate-300 text-sm flex items-center">
+                            <FileEdit className="w-3 h-3 mr-2 text-blue-400" />
+                            Descrição
+                          </Label>
                           <Input
                             value={item.descricao}
                             onChange={(e) => updateItem(item.id, 'descricao', e.target.value)}
-                            className="bg-slate-600 border-slate-500 text-slate-100 text-sm mt-1"
+                            className="bg-slate-600/80 border-slate-500/50 text-slate-100 text-sm focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200"
                             placeholder="Digite a descrição"
                           />
                         </div>
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
                             <Label className="text-slate-300 text-sm">Quantidade</Label>
                             <Input
                               type="number"
                               value={item.quantidade}
                               onChange={(e) => updateItem(item.id, 'quantidade', parseFloat(e.target.value) || 0)}
-                              className="bg-slate-600 border-slate-500 text-slate-100 text-sm mt-1"
+                              className="bg-slate-600/80 border-slate-500/50 text-slate-100 text-sm focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200"
                               placeholder="0"
                             />
                           </div>
-                          <div>
+                          <div className="space-y-2">
                             <Label className="text-slate-300 text-sm">Valor Unitário</Label>
                             <Input
                               type="number"
                               step="0.01"
                               value={item.valorUnitario}
                               onChange={(e) => updateItem(item.id, 'valorUnitario', parseFloat(e.target.value) || 0)}
-                              className="bg-slate-600 border-slate-500 text-slate-100 text-sm mt-1"
+                              className="bg-slate-600/80 border-slate-500/50 text-slate-100 text-sm focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200"
                               placeholder="0,00"
                             />
                           </div>
                         </div>
-                        <div className="bg-slate-600 p-3 rounded">
+                        <div className="bg-gradient-to-r from-slate-600/80 to-slate-500/80 p-4 rounded-lg shadow-inner">
                           <div className="flex justify-between items-center">
-                            <span className="text-slate-300 text-sm">Valor Total:</span>
-                            <span className="text-blue-300 font-bold">R$ {item.valorTotal.toFixed(2)}</span>
+                            <span className="text-slate-300 text-sm font-medium">Valor Total:</span>
+                            <span className="text-blue-300 font-bold text-lg">R$ {item.valorTotal.toFixed(2)}</span>
                           </div>
                         </div>
                       </CardContent>
                     </Card>
                   ))}
                   
-                  {/* Total geral no mobile */}
-                  <Card className="bg-blue-900 border-blue-700">
-                    <CardContent className="p-4">
+                  {/* Enhanced Total Mobile */}
+                  <Card className="bg-gradient-to-r from-blue-900/80 to-purple-900/80 backdrop-blur-sm border-blue-700/50 shadow-2xl overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-purple-600/10"></div>
+                    <CardContent className="relative p-6">
                       <div className="flex justify-between items-center">
                         <span className="text-blue-100 font-bold text-lg">TOTAL GERAL:</span>
-                        <span className="text-blue-100 font-bold text-xl">R$ {getTotalGeral().toFixed(2)}</span>
+                        <span className="text-white font-bold text-2xl drop-shadow-lg">R$ {getTotalGeral().toFixed(2)}</span>
                       </div>
                     </CardContent>
                   </Card>
@@ -1066,6 +1102,18 @@ const Index = () => {
             </Card>
           </div>
         )}
+
+        {/* Developer Credit */}
+        <div className="mt-12 text-center">
+          <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-slate-800/80 to-slate-700/80 backdrop-blur-sm border border-slate-600/50 rounded-full shadow-lg">
+            <span className="text-slate-400 text-sm">
+              Desenvolvido por{" "}
+              <span className="text-transparent bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text font-semibold">
+                ALEKSANDRO ALVES
+              </span>
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );
