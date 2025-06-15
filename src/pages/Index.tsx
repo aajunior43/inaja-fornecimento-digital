@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,11 +7,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Download, Eye, Calendar, User, Mail, Phone, MapPin, MessageSquare } from 'lucide-react';
+import { FileText, Download, Eye, Calendar, User, Mail, Phone, MapPin, MessageSquare, Plus, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
+
+interface Item {
+  id: number;
+  descricao: string;
+  valor: string;
+  unidade: string;
+}
 
 const Index = () => {
   const [formData, setFormData] = useState({
@@ -23,6 +31,10 @@ const Index = () => {
     prioridade: 'Normal'
   });
 
+  const [items, setItems] = useState<Item[]>([
+    { id: 1, descricao: '', valor: '', unidade: '' }
+  ]);
+
   const [showPreview, setShowPreview] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
@@ -30,6 +42,23 @@ const Index = () => {
       ...prev,
       [field]: value
     }));
+  };
+
+  const addItem = () => {
+    const newId = Math.max(...items.map(item => item.id), 0) + 1;
+    setItems([...items, { id: newId, descricao: '', valor: '', unidade: '' }]);
+  };
+
+  const removeItem = (id: number) => {
+    if (items.length > 1) {
+      setItems(items.filter(item => item.id !== id));
+    }
+  };
+
+  const updateItem = (id: number, field: keyof Item, value: string) => {
+    setItems(items.map(item => 
+      item.id === id ? { ...item, [field]: value } : item
+    ));
   };
 
   const getCurrentDate = () => {
@@ -119,6 +148,20 @@ const Index = () => {
     doc.text(`ENDEREÇO: ${formData.endereco}`, 20, yPosition);
     yPosition += lineHeight * 1.5;
 
+    // Itens solicitados
+    doc.setFont('helvetica', 'bold');
+    doc.text(`ITENS SOLICITADOS:`, 20, yPosition);
+    yPosition += lineHeight * 1.5;
+
+    doc.setFont('helvetica', 'normal');
+    items.forEach((item, index) => {
+      if (item.descricao) {
+        doc.text(`${index + 1}. ${item.descricao} - Valor: ${item.valor} - Unidade: ${item.unidade}`, 20, yPosition);
+        yPosition += lineHeight;
+      }
+    });
+    yPosition += lineHeight;
+
     doc.setFont('helvetica', 'bold');
     doc.text(`MENSAGEM:`, 20, yPosition);
     yPosition += lineHeight * 1.5;
@@ -141,6 +184,11 @@ const Index = () => {
   };
 
   const generateWord = () => {
+    const itemsText = items
+      .filter(item => item.descricao)
+      .map((item, index) => `${index + 1}. ${item.descricao} - Valor: ${item.valor} - Unidade: ${item.unidade}`)
+      .join('\n');
+
     const content = `
 PREFEITURA MUNICIPAL
 SECRETARIA DE ADMINISTRAÇÃO
@@ -156,6 +204,9 @@ NOME: ${formData.nome || 'N/A'}
 EMAIL: ${formData.email}
 TELEFONE: ${formData.telefone}
 ENDEREÇO: ${formData.endereco}
+
+ITENS SOLICITADOS:
+${itemsText}
 
 MENSAGEM:
 ${formData.mensagem}
@@ -186,11 +237,23 @@ Gerado em: ${new Date().toLocaleString('pt-BR')}
       ['Telefone', formData.telefone],
       ['Endereço', formData.endereco],
       [''],
+      ['Itens Solicitados'],
+      ['Item', 'Valor', 'Unidade']
+    ];
+
+    items.forEach((item, index) => {
+      if (item.descricao) {
+        data.push([item.descricao, item.valor, item.unidade]);
+      }
+    });
+
+    data.push(
+      [''],
       ['Mensagem', formData.mensagem],
       [''],
       ['Este documento foi gerado automaticamente pelo Sistema de Solicitações da Prefeitura Municipal'],
       ['Gerado em:', new Date().toLocaleString('pt-BR')]
-    ];
+    );
 
     const ws = XLSX.utils.aoa_to_sheet(data);
     const wb = XLSX.utils.book_new();
@@ -305,6 +368,66 @@ Gerado em: ${new Date().toLocaleString('pt-BR')}
                 />
               </div>
 
+              {/* Seção de Itens */}
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <label className="text-sm font-medium text-slate-700">
+                    Itens Solicitados
+                  </label>
+                  <Button
+                    type="button"
+                    onClick={addItem}
+                    size="sm"
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    <Plus className="w-4 h-4 mr-1" />
+                    Adicionar Item
+                  </Button>
+                </div>
+                
+                <div className="space-y-3">
+                  {items.map((item, index) => (
+                    <div key={item.id} className="grid grid-cols-12 gap-2 items-end">
+                      <div className="col-span-5">
+                        <Input
+                          placeholder="Descrição do item"
+                          value={item.descricao}
+                          onChange={(e) => updateItem(item.id, 'descricao', e.target.value)}
+                          className="border-slate-300"
+                        />
+                      </div>
+                      <div className="col-span-3">
+                        <Input
+                          placeholder="Valor"
+                          value={item.valor}
+                          onChange={(e) => updateItem(item.id, 'valor', e.target.value)}
+                          className="border-slate-300"
+                        />
+                      </div>
+                      <div className="col-span-3">
+                        <Input
+                          placeholder="Unidade"
+                          value={item.unidade}
+                          onChange={(e) => updateItem(item.id, 'unidade', e.target.value)}
+                          className="border-slate-300"
+                        />
+                      </div>
+                      <div className="col-span-1">
+                        <Button
+                          type="button"
+                          onClick={() => removeItem(item.id)}
+                          size="sm"
+                          variant="destructive"
+                          disabled={items.length === 1}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <div>
                 <label className="text-sm font-medium text-slate-700 mb-2 block">
                   Mensagem
@@ -374,6 +497,24 @@ Gerado em: ${new Date().toLocaleString('pt-BR')}
                     </div>
 
                     <div className="mb-4">
+                      <p><strong>ITENS SOLICITADOS:</strong></p>
+                      {items.filter(item => item.descricao).length > 0 ? (
+                        <ul className="list-decimal list-inside mt-2">
+                          {items
+                            .filter(item => item.descricao)
+                            .map((item, index) => (
+                              <li key={item.id} className="mb-1">
+                                {item.descricao} - Valor: {item.valor} - Unidade: {item.unidade}
+                              </li>
+                            ))}
+                        </ul>
+                      ) : (
+                        <p className="text-gray-400">Nenhum item adicionado</p>
+                      )}
+                    </div>
+
+                    <div className="mb-4">
+                      <p><strong>MENSAGEM:</strong></p>
                       <p className="whitespace-pre-wrap">{formData.mensagem || 'Mensagem do solicitante...'}</p>
                     </div>
                   </div>
