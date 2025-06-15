@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -354,9 +353,10 @@ const Index = () => {
                   new ImageRun({
                     data: logoBuffer,
                     transformation: {
-                      width: 100,
-                      height: 100,
+                      width: 80,
+                      height: 80,
                     },
+                    type: "png",
                   }),
                   new TextRun({
                     text: "     ", // Espaçamento
