@@ -105,46 +105,46 @@ const RequestForm = () => {
 
                 <div>
                   <Label htmlFor="orderer">Ordenador de Despesa</Label>
-                  <Select value={formData.ordererId} onValueChange={(value) => handleChange('ordererId', value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o ordenador" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {config.orderers.length > 0 ? (
-                        config.orderers.map((orderer) => (
+                  {config.orderers.length > 0 ? (
+                    <Select value={formData.ordererId} onValueChange={(value) => handleChange('ordererId', value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o ordenador" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {config.orderers.map((orderer) => (
                           <SelectItem key={orderer.id} value={orderer.id}>
                             {orderer.name} - {orderer.position}
                           </SelectItem>
-                        ))
-                      ) : (
-                        <SelectItem value="" disabled>
-                          Nenhum ordenador cadastrado
-                        </SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <div className="h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm text-muted-foreground flex items-center">
+                      Nenhum ordenador cadastrado
+                    </div>
+                  )}
                 </div>
 
                 <div>
                   <Label htmlFor="supplier">Fornecedor</Label>
-                  <Select value={formData.supplierId} onValueChange={(value) => handleChange('supplierId', value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o fornecedor" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {config.suppliers.length > 0 ? (
-                        config.suppliers.map((supplier) => (
+                  {config.suppliers.length > 0 ? (
+                    <Select value={formData.supplierId} onValueChange={(value) => handleChange('supplierId', value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o fornecedor" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {config.suppliers.map((supplier) => (
                           <SelectItem key={supplier.id} value={supplier.id}>
                             {supplier.name} - {supplier.cnpj}
                           </SelectItem>
-                        ))
-                      ) : (
-                        <SelectItem value="" disabled>
-                          Nenhum fornecedor cadastrado
-                        </SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <div className="h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm text-muted-foreground flex items-center">
+                      Nenhum fornecedor cadastrado
+                    </div>
+                  )}
                 </div>
 
                 <div className="md:col-span-2">
