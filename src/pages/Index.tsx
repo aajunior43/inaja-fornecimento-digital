@@ -12,7 +12,7 @@ import { ptBR } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
 import jsPDF from 'jspdf';
 import * as XLSX from 'xlsx';
-import { Document, Packer, Paragraph, Table, TableCell, TableRow, WidthType, AlignmentType, BorderStyle, TextRun } from 'docx';
+import { Document, Packer, Paragraph, Table, TableCell, TableRow, WidthType, AlignmentType, BorderStyle, TextRun, ImageRun } from 'docx';
 import { saveAs } from 'file-saver';
 
 interface Item {
@@ -318,6 +318,22 @@ const Index = () => {
 
   const exportToWord = async () => {
     try {
+      // Função para converter imagem para buffer
+      const getImageBuffer = async (imageSrc: string): Promise<Uint8Array | null> => {
+        try {
+          const response = await fetch(imageSrc);
+          if (!response.ok) throw new Error('Failed to fetch image');
+          const arrayBuffer = await response.arrayBuffer();
+          return new Uint8Array(arrayBuffer);
+        } catch (error) {
+          console.error('Error loading image:', error);
+          return null;
+        }
+      };
+
+      // Carregar o logo
+      const logoBuffer = await getImageBuffer('/lovable-uploads/007f16c7-9a20-4239-954a-386da9c3b0b4.png');
+
       const doc = new Document({
         sections: [{
           properties: {
@@ -331,9 +347,21 @@ const Index = () => {
             },
           },
           children: [
-            // Cabeçalho sem logo - mais limpo e funcional
+            // Cabeçalho com logo
             new Paragraph({
               children: [
+                ...(logoBuffer ? [
+                  new ImageRun({
+                    data: logoBuffer,
+                    transformation: {
+                      width: 100,
+                      height: 100,
+                    },
+                  }),
+                  new TextRun({
+                    text: "     ", // Espaçamento
+                  }),
+                ] : []),
                 new TextRun({
                   text: "PREFEITURA MUNICIPAL DE INAJÁ",
                   bold: true,
