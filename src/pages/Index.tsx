@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -221,7 +222,7 @@ const Index = () => {
       doc.text("VALOR UNIT.", 148, yPosition - 2, { align: "center" });
       doc.text("VALOR TOTAL", 176, yPosition - 2, { align: "center" });
       
-      yPosition += 7;
+      yPosition += 4; // Ajuste para posição inicial dos itens
       
       // Itens da tabela sem cores alternadas
       doc.setFont("helvetica", "normal");
@@ -234,32 +235,40 @@ const Index = () => {
           yPosition = 20;
         }
         
-        // Desenhar bordas das células
-        doc.rect(20, yPosition - 5, 25, 10);
-        doc.rect(45, yPosition - 5, 70, 10);
-        doc.rect(115, yPosition - 5, 20, 10);
-        doc.rect(135, yPosition - 5, 27, 10);
-        doc.rect(162, yPosition - 5, 28, 10);
+        // Altura da linha
+        const rowHeight = 8;
         
-        // Texto das células
-        doc.text(item.item.substring(0, 20), 22, yPosition);
-        doc.text(item.descricao.substring(0, 45), 47, yPosition);
-        doc.text(item.quantidade.toString(), 125, yPosition, { align: "center" });
-        doc.text(`R$ ${item.valorUnitario.toFixed(2)}`, 148, yPosition, { align: "center" });
-        doc.text(`R$ ${item.valorTotal.toFixed(2)}`, 176, yPosition, { align: "center" });
-        yPosition += 10;
+        // Desenhar bordas das células
+        doc.rect(20, yPosition, 25, rowHeight);
+        doc.rect(45, yPosition, 70, rowHeight);
+        doc.rect(115, yPosition, 20, rowHeight);
+        doc.rect(135, yPosition, 27, rowHeight);
+        doc.rect(162, yPosition, 28, rowHeight);
+        
+        // Texto das células - centralizado verticalmente
+        const textY = yPosition + (rowHeight / 2) + 1;
+        doc.text(item.item.substring(0, 20), 22, textY);
+        doc.text(item.descricao.substring(0, 45), 47, textY);
+        doc.text(item.quantidade.toString(), 125, textY, { align: "center" });
+        doc.text(`R$ ${item.valorUnitario.toFixed(2)}`, 148, textY, { align: "center" });
+        doc.text(`R$ ${item.valorTotal.toFixed(2)}`, 176, textY, { align: "center" });
+        yPosition += rowHeight;
       });
       
       // Total geral com fundo cinza
+      const rowHeight = 8;
       doc.setFillColor(220, 220, 220);
-      doc.rect(20, yPosition - 5, 142, 10, 'F');
-      doc.rect(162, yPosition - 5, 28, 10, 'F');
-      doc.rect(20, yPosition - 5, 170, 10, 'S');
+      doc.rect(20, yPosition, 142, rowHeight, 'F');
+      doc.rect(162, yPosition, 28, rowHeight, 'F');
+      doc.rect(20, yPosition, 170, rowHeight, 'S');
       
       doc.setFont("helvetica", "bold");
       doc.setTextColor(0, 0, 0);
-      doc.text("TOTAL GERAL:", 148, yPosition, { align: "center" });
-      doc.text(`R$ ${getTotalGeral().toFixed(2)}`, 176, yPosition, { align: "center" });
+      const textY = yPosition + (rowHeight / 2) + 1;
+      doc.text("TOTAL GERAL:", 148, textY, { align: "center" });
+      doc.text(`R$ ${getTotalGeral().toFixed(2)}`, 176, textY, { align: "center" });
+      
+      yPosition += rowHeight + 10; // Espaço após a tabela
       
       // Observações
       if (formData.observacoes) {
