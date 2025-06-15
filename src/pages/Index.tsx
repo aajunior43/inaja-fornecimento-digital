@@ -53,17 +53,17 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="max-w-6xl mx-auto space-y-6">
         <FormHeader formData={formData} setFormData={setFormData} />
         
-        <Separator />
+        <Separator className="my-6" />
         
         <ItemsTable items={items} setItems={setItems} />
         
-        <Separator />
+        <Separator className="my-6" />
         
-        <div className="text-center">
+        <div className="bg-white rounded-lg shadow-sm p-6">
           <ExportActions 
             formData={formData}
             items={items}
