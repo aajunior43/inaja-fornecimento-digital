@@ -5,10 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { Plus, Minus, FileText, Download, Trash2, Eye, Menu, Building2, User, Calendar, FileEdit } from "lucide-react";
+import { Plus, Minus, FileText, Download, Trash2, Eye, Menu, Building2, User, Calendar, FileEdit, Shield } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
+import { useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import * as XLSX from 'xlsx';
 import { Document, Packer, Paragraph, Table, TableCell, TableRow, WidthType, AlignmentType, BorderStyle, TextRun, ImageRun } from 'docx';
@@ -31,6 +32,7 @@ interface FormData {
 }
 
 const Index = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
     nomeSolicitante: '',
     nomeEmpresa: '',
@@ -815,6 +817,14 @@ const Index = () => {
                       Exportar Excel
                     </Button>
                     <Separator className="bg-gradient-to-r from-slate-600/50 to-slate-500/50" />
+                    <Button 
+                      onClick={() => navigate('/admin/login')} 
+                      className="w-full bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                      size="sm"
+                    >
+                      <Shield className="mr-2 h-4 w-4" />
+                      Área Administrativa
+                    </Button>
                     <Button 
                       onClick={clearForm} 
                       variant="destructive" 
