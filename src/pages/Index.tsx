@@ -10,8 +10,9 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
 import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import * as XLSX from 'xlsx';
-import { Document, Packer, Paragraph, Table, TableCell, TableRow, WidthType, AlignmentType, HeadingLevel } from 'docx';
+import { Document, Packer, Paragraph, Table, TableCell, TableRow, WidthType, AlignmentType, HeadingLevel, BorderStyle } from 'docx';
 
 interface Item {
   id: string;
@@ -159,55 +160,69 @@ const Index = () => {
       doc.text(`Empresa: ${formData.nomeEmpresa}`, 20, 87);
       doc.text(`Data: ${formData.dataSolicitacao}`, 20, 94);
       
-      // Tabela de itens
-      let yPosition = 110;
-      doc.setFont("helvetica", "bold");
-      doc.text("ITEM", 20, yPosition);
-      doc.text("DESCRIÇÃO", 40, yPosition);
-      doc.text("QTD", 120, yPosition);
-      doc.text("VALOR UNIT.", 140, yPosition);
-      doc.text("VALOR TOTAL", 170, yPosition);
+      // Preparar dados da tabela
+      const tableData = items.map(item => [
+        item.item,
+        item.descricao,
+        item.quantidade.toString(),
+        `R$ ${item.valorUnitario.toFixed(2)}`,
+        `R$ ${item.valorTotal.toFixed(2)}`
+      ]);
       
-      yPosition += 7;
-      doc.line(20, yPosition, 190, yPosition);
-      yPosition += 5;
-      
-      doc.setFont("helvetica", "normal");
-      items.forEach((item) => {
-        if (yPosition > 250) {
-          doc.addPage();
-          yPosition = 20;
+      // Adicionar linha do total
+      tableData.push([
+        '', '', '', 'TOTAL GERAL:', `R$ ${getTotalGeral().toFixed(2)}`
+      ]);
+
+      // Usar autoTable para criar tabela formatada
+      (doc as any).autoTable({
+        startY: 105,
+        head: [['ITEM', 'DESCRIÇÃO', 'QTD', 'VALOR UNIT.', 'VALOR TOTAL']],
+        body: tableData,
+        theme: 'grid',
+        styles: {
+          fontSize: 9,
+          cellPadding: 3,
+          lineColor: [0, 0, 0],
+          lineWidth: 0.5,
+        },
+        headStyles: {
+          fillColor: [200, 200, 200],
+          textColor: [0, 0, 0],
+          fontStyle: 'bold',
+        },
+        columnStyles: {
+          0: { cellWidth: 25 },
+          1: { cellWidth: 60 },
+          2: { cellWidth: 20, halign: 'center' },
+          3: { cellWidth: 30, halign: 'right' },
+          4: { cellWidth: 30, halign: 'right' }
+        },
+        didParseCell: function(data: any) {
+          if (data.row.index === tableData.length - 1) {
+            data.cell.styles.fontStyle = 'bold';
+            data.cell.styles.fillColor = [240, 240, 240];
+          }
         }
-        doc.text(item.item, 20, yPosition);
-        doc.text(item.descricao.substring(0, 30), 40, yPosition);
-        doc.text(item.quantidade.toString(), 120, yPosition);
-        doc.text(`R$ ${item.valorUnitario.toFixed(2)}`, 140, yPosition);
-        doc.text(`R$ ${item.valorTotal.toFixed(2)}`, 170, yPosition);
-        yPosition += 7;
       });
       
-      // Total geral
-      yPosition += 5;
-      doc.line(20, yPosition, 190, yPosition);
-      yPosition += 7;
-      doc.setFont("helvetica", "bold");
-      doc.text(`TOTAL GERAL: R$ ${getTotalGeral().toFixed(2)}`, 170, yPosition, { align: "right" });
+      let finalY = (doc as any).lastAutoTable.finalY + 10;
       
       // Observações
       if (formData.observacoes) {
-        yPosition += 15;
         doc.setFont("helvetica", "bold");
-        doc.text("OBSERVAÇÕES:", 20, yPosition);
-        yPosition += 7;
+        doc.text("OBSERVAÇÕES:", 20, finalY);
+        finalY += 7;
         doc.setFont("helvetica", "normal");
         const splitText = doc.splitTextToSize(formData.observacoes, 170);
-        doc.text(splitText, 20, yPosition);
+        doc.text(splitText, 20, finalY);
+        finalY += splitText.length * 5;
       }
       
       // Espaço para assinatura
-      yPosition += 30;
-      doc.line(20, yPosition, 90, yPosition);
-      doc.text("Assinatura do Solicitante", 20, yPosition + 10);
+      finalY += 20;
+      doc.line(20, finalY, 90, finalY);
+      doc.text("Assinatura do Solicitante", 20, finalY + 10);
       
       doc.save(`Solicitacao_Fornecimento_${formData.dataSolicitacao.replace(/\//g, '')}.pdf`);
       
@@ -242,6 +257,32 @@ const Index = () => {
     ];
 
     const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+    
+    // Definir larguras das colunas
+    worksheet['!cols'] = [
+      { wch: 15 }, // ITEM
+      { wch: 40 }, // DESCRIÇÃO
+      { wch: 12 }, // QUANTIDADE
+      { wch: 15 }, // VALOR UNITÁRIO
+      { wch: 15 }  // VALOR TOTAL
+    ];
+
+    // Aplicar bordas na tabela de itens
+    const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1:E20');
+    for (let R = 7; R <= 7 + items.length + 1; ++R) {
+      for (let C = 0; C < 5; ++C) {
+        const cell_address = XLSX.utils.encode_cell({ c: C, r: R });
+        if (!worksheet[cell_address]) worksheet[cell_address] = {};
+        if (!worksheet[cell_address].s) worksheet[cell_address].s = {};
+        worksheet[cell_address].s.border = {
+          top: { style: 'thin', color: { rgb: '000000' } },
+          bottom: { style: 'thin', color: { rgb: '000000' } },
+          left: { style: 'thin', color: { rgb: '000000' } },
+          right: { style: 'thin', color: { rgb: '000000' } }
+        };
+      }
+    }
+
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Solicitação');
     
@@ -299,32 +340,160 @@ const Index = () => {
               size: 100,
               type: WidthType.PERCENTAGE,
             },
+            borders: {
+              top: { style: BorderStyle.SINGLE, size: 1 },
+              bottom: { style: BorderStyle.SINGLE, size: 1 },
+              left: { style: BorderStyle.SINGLE, size: 1 },
+              right: { style: BorderStyle.SINGLE, size: 1 },
+              insideHorizontal: { style: BorderStyle.SINGLE, size: 1 },
+              insideVertical: { style: BorderStyle.SINGLE, size: 1 },
+            },
             rows: [
               new TableRow({
                 children: [
-                  new TableCell({ children: [new Paragraph("ITEM")] }),
-                  new TableCell({ children: [new Paragraph("DESCRIÇÃO")] }),
-                  new TableCell({ children: [new Paragraph("QTD")] }),
-                  new TableCell({ children: [new Paragraph("VALOR UNIT.")] }),
-                  new TableCell({ children: [new Paragraph("VALOR TOTAL")] }),
+                  new TableCell({ 
+                    children: [new Paragraph("ITEM")],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
+                  new TableCell({ 
+                    children: [new Paragraph("DESCRIÇÃO")],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
+                  new TableCell({ 
+                    children: [new Paragraph("QTD")],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
+                  new TableCell({ 
+                    children: [new Paragraph("VALOR UNIT.")],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
+                  new TableCell({ 
+                    children: [new Paragraph("VALOR TOTAL")],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
                 ],
               }),
               ...items.map(item => new TableRow({
                 children: [
-                  new TableCell({ children: [new Paragraph(item.item)] }),
-                  new TableCell({ children: [new Paragraph(item.descricao)] }),
-                  new TableCell({ children: [new Paragraph(item.quantidade.toString())] }),
-                  new TableCell({ children: [new Paragraph(`R$ ${item.valorUnitario.toFixed(2)}`)] }),
-                  new TableCell({ children: [new Paragraph(`R$ ${item.valorTotal.toFixed(2)}`)] }),
+                  new TableCell({ 
+                    children: [new Paragraph(item.item)],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
+                  new TableCell({ 
+                    children: [new Paragraph(item.descricao)],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
+                  new TableCell({ 
+                    children: [new Paragraph(item.quantidade.toString())],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
+                  new TableCell({ 
+                    children: [new Paragraph(`R$ ${item.valorUnitario.toFixed(2)}`)],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
+                  new TableCell({ 
+                    children: [new Paragraph(`R$ ${item.valorTotal.toFixed(2)}`)],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
                 ],
               })),
               new TableRow({
                 children: [
-                  new TableCell({ children: [new Paragraph("")] }),
-                  new TableCell({ children: [new Paragraph("")] }),
-                  new TableCell({ children: [new Paragraph("")] }),
-                  new TableCell({ children: [new Paragraph("TOTAL GERAL:")] }),
-                  new TableCell({ children: [new Paragraph(`R$ ${getTotalGeral().toFixed(2)}`)] }),
+                  new TableCell({ 
+                    children: [new Paragraph("")],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
+                  new TableCell({ 
+                    children: [new Paragraph("")],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
+                  new TableCell({ 
+                    children: [new Paragraph("")],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
+                  new TableCell({ 
+                    children: [new Paragraph("TOTAL GERAL:")],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
+                  new TableCell({ 
+                    children: [new Paragraph(`R$ ${getTotalGeral().toFixed(2)}`)],
+                    borders: {
+                      top: { style: BorderStyle.SINGLE, size: 1 },
+                      bottom: { style: BorderStyle.SINGLE, size: 1 },
+                      left: { style: BorderStyle.SINGLE, size: 1 },
+                      right: { style: BorderStyle.SINGLE, size: 1 },
+                    }
+                  }),
                 ],
               }),
             ],
