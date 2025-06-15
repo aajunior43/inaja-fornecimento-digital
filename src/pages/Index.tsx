@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
@@ -7,6 +6,7 @@ import { toast } from "@/hooks/use-toast";
 import FormHeader from '@/components/FormHeader';
 import ItemsTable, { Item } from '@/components/ItemsTable';
 import ExportActions from '@/components/ExportActions';
+import ThemeToggle from '@/components/ThemeToggle';
 
 const Index = () => {
   const [formData, setFormData] = useState({
@@ -53,17 +53,18 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4 md:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-900 p-4 md:p-6 transition-colors duration-300">
+      <ThemeToggle />
       <div className="max-w-7xl mx-auto space-y-8">
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/20 overflow-hidden">
           <FormHeader formData={formData} setFormData={setFormData} />
         </div>
         
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 dark:border-gray-700/20 overflow-hidden">
           <ItemsTable items={items} setItems={setItems} />
         </div>
         
-        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl shadow-xl p-6 text-white">
+        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 dark:from-blue-600 dark:to-indigo-700 rounded-2xl shadow-xl p-6 text-white">
           <div className="flex flex-col items-center space-y-4">
             <h3 className="text-lg font-semibold">Ações do Documento</h3>
             <ExportActions 
