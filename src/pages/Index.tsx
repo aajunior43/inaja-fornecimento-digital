@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -200,7 +199,7 @@ const Index = () => {
       
       // Cabeçalho da tabela em tom mais sóbrio
       doc.setFillColor(lightGray[0], lightGray[1], lightGray[2]);
-      doc.rect(20, yPosition - 8, 170, 12, 'F');
+      doc.rect(20, yPosition, 170, 10, 'F');
       
       doc.setFont("helvetica", "bold");
       doc.setFontSize(9);
@@ -209,20 +208,20 @@ const Index = () => {
       // Desenhar bordas do cabeçalho
       doc.setDrawColor(0, 0, 0);
       doc.setLineWidth(0.5);
-      doc.rect(20, yPosition - 8, 25, 12);
-      doc.rect(45, yPosition - 8, 70, 12);
-      doc.rect(115, yPosition - 8, 20, 12);
-      doc.rect(135, yPosition - 8, 27, 12);
-      doc.rect(162, yPosition - 8, 28, 12);
+      doc.rect(20, yPosition, 25, 10);
+      doc.rect(45, yPosition, 70, 10);
+      doc.rect(115, yPosition, 20, 10);
+      doc.rect(135, yPosition, 27, 10);
+      doc.rect(162, yPosition, 28, 10);
       
       // Texto do cabeçalho
-      doc.text("ITEM", 32, yPosition - 2, { align: "center" });
-      doc.text("DESCRIÇÃO", 80, yPosition - 2, { align: "center" });
-      doc.text("QTD", 125, yPosition - 2, { align: "center" });
-      doc.text("VALOR UNIT.", 148, yPosition - 2, { align: "center" });
-      doc.text("VALOR TOTAL", 176, yPosition - 2, { align: "center" });
+      doc.text("ITEM", 32, yPosition + 6, { align: "center" });
+      doc.text("DESCRIÇÃO", 80, yPosition + 6, { align: "center" });
+      doc.text("QTD", 125, yPosition + 6, { align: "center" });
+      doc.text("VALOR UNIT.", 148, yPosition + 6, { align: "center" });
+      doc.text("VALOR TOTAL", 176, yPosition + 6, { align: "center" });
       
-      yPosition += 4; // Ajuste para posição inicial dos itens
+      yPosition += 10; // Move para a primeira linha de dados
       
       // Itens da tabela sem cores alternadas
       doc.setFont("helvetica", "normal");
@@ -235,7 +234,7 @@ const Index = () => {
           yPosition = 20;
         }
         
-        // Altura da linha
+        // Altura da linha fixa
         const rowHeight = 8;
         
         // Desenhar bordas das células
@@ -246,7 +245,7 @@ const Index = () => {
         doc.rect(162, yPosition, 28, rowHeight);
         
         // Texto das células - centralizado verticalmente
-        const textY = yPosition + (rowHeight / 2) + 1;
+        const textY = yPosition + (rowHeight / 2) + 1.5;
         doc.text(item.item.substring(0, 20), 22, textY);
         doc.text(item.descricao.substring(0, 45), 47, textY);
         doc.text(item.quantidade.toString(), 125, textY, { align: "center" });
@@ -255,41 +254,44 @@ const Index = () => {
         yPosition += rowHeight;
       });
       
-      // Total geral com fundo cinza
-      const rowHeight = 8;
+      // Total geral com fundo cinza - altura consistente
+      const totalRowHeight = 8;
       doc.setFillColor(220, 220, 220);
-      doc.rect(20, yPosition, 142, rowHeight, 'F');
-      doc.rect(162, yPosition, 28, rowHeight, 'F');
-      doc.rect(20, yPosition, 170, rowHeight, 'S');
+      doc.rect(20, yPosition, 142, totalRowHeight, 'F');
+      doc.rect(162, yPosition, 28, totalRowHeight, 'F');
+      
+      // Bordas do total
+      doc.setDrawColor(0, 0, 0);
+      doc.rect(20, yPosition, 142, totalRowHeight, 'S');
+      doc.rect(162, yPosition, 28, totalRowHeight, 'S');
       
       doc.setFont("helvetica", "bold");
       doc.setTextColor(0, 0, 0);
-      const textY = yPosition + (rowHeight / 2) + 1;
-      doc.text("TOTAL GERAL:", 148, textY, { align: "center" });
-      doc.text(`R$ ${getTotalGeral().toFixed(2)}`, 176, textY, { align: "center" });
+      const totalTextY = yPosition + (totalRowHeight / 2) + 1.5;
+      doc.text("TOTAL GERAL:", 148, totalTextY, { align: "center" });
+      doc.text(`R$ ${getTotalGeral().toFixed(2)}`, 176, totalTextY, { align: "center" });
       
-      yPosition += rowHeight + 10; // Espaço após a tabela
+      yPosition += totalRowHeight + 15; // Espaço após a tabela
       
       // Observações
       if (formData.observacoes) {
-        yPosition += 20;
         doc.setDrawColor(200, 200, 200);
         doc.setTextColor(0, 0, 0);
         
         const observHeight = Math.max(20, doc.splitTextToSize(formData.observacoes, 160).length * 5 + 10);
-        doc.rect(20, yPosition - 5, 170, observHeight, 'S');
+        doc.rect(20, yPosition, 170, observHeight, 'S');
         
         doc.setFont("helvetica", "bold");
-        doc.text("OBSERVAÇÕES:", 25, yPosition + 2);
-        yPosition += 10;
+        doc.text("OBSERVAÇÕES:", 25, yPosition + 8);
+        yPosition += 15;
         doc.setFont("helvetica", "normal");
         const splitText = doc.splitTextToSize(formData.observacoes, 160);
         doc.text(splitText, 25, yPosition);
-        yPosition += observHeight - 10;
+        yPosition += observHeight;
       }
       
       // Espaço para assinatura mais adequado
-      yPosition += 40;
+      yPosition += 30;
       
       // Uma linha para assinatura centralizada
       doc.setDrawColor(0, 0, 0);
@@ -546,12 +548,8 @@ const Index = () => {
         }],
       });
 
-      const buffer = await Packer.toBuffer(doc);
-      const blob = new Blob([buffer], { 
-        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
-      });
-      
-      // Usar saveAs do file-saver para melhor compatibilidade
+      // Usar abordagem mais compatível com browser
+      const blob = await Packer.toBlob(doc);
       saveAs(blob, `Solicitacao_Fornecimento_${formData.dataSolicitacao.replace(/\//g, '')}.docx`);
       
       toast({
