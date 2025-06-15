@@ -40,25 +40,60 @@ const Index = () => {
     });
   };
 
-  const generatePDF = () => {
+  const addBrasaoToPDF = async (doc: jsPDF) => {
+    try {
+      // Carrega o brasão da prefeitura
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      
+      return new Promise((resolve) => {
+        img.onload = () => {
+          // Adiciona o brasão no canto superior esquerdo
+          doc.addImage(img, 'PNG', 20, 15, 25, 25);
+          resolve(true);
+        };
+        img.onerror = () => {
+          console.log('Erro ao carregar brasão, continuando sem imagem');
+          resolve(false);
+        };
+        img.src = '/lovable-uploads/007f16c7-9a20-4239-954a-386da9c3b0b4.png';
+      });
+    } catch (error) {
+      console.log('Erro ao processar brasão:', error);
+      return false;
+    }
+  };
+
+  const generatePDF = async () => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     
-    // Header
+    // Adiciona o brasão da prefeitura
+    await addBrasaoToPDF(doc);
+
+    // Header oficial com brasão
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('PREFEITURA MUNICIPAL', 55, 25);
+    doc.setFontSize(12);
+    doc.text('SECRETARIA DE ADMINISTRAÇÃO', 55, 32);
+    doc.setFontSize(10);
+    doc.text('Rua Principal, 123 - Centro - CEP: 12345-678', 55, 38);
+    
+    // Título do documento
     doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
-    doc.text('PREFEITURA MUNICIPAL', pageWidth / 2, 30, { align: 'center' });
-    doc.text('SOLICITAÇÃO DE SERVIÇO', pageWidth / 2, 45, { align: 'center' });
+    doc.text('SOLICITAÇÃO DE SERVIÇO', pageWidth / 2, 55, { align: 'center' });
 
     // Separador
     doc.setLineWidth(0.5);
-    doc.line(20, 55, pageWidth - 20, 55);
+    doc.line(20, 65, pageWidth - 20, 65);
 
     // Conteúdo da solicitação
     doc.setFontSize(12);
     doc.setFont('helvetica', 'normal');
     
-    let yPosition = 70;
+    let yPosition = 75;
     const lineHeight = 8;
 
     doc.text(`DATA: ${getCurrentDate()}`, 20, yPosition);
@@ -95,12 +130,22 @@ const Index = () => {
       yPosition += contentLines.length * lineHeight + 10;
     }
 
+    // Rodapé oficial
+    const footerY = doc.internal.pageSize.getHeight() - 30;
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'italic');
+    doc.text('Este documento foi gerado automaticamente pelo Sistema de Solicitações da Prefeitura Municipal', pageWidth / 2, footerY, { align: 'center' });
+    doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, pageWidth / 2, footerY + 5, { align: 'center' });
+
     doc.save(`solicitacao_${formData.nome || 'sem_nome'}.pdf`);
   };
 
   const generateWord = () => {
     const content = `
 PREFEITURA MUNICIPAL
+SECRETARIA DE ADMINISTRAÇÃO
+Rua Principal, 123 - Centro - CEP: 12345-678
+
 SOLICITAÇÃO DE SERVIÇO
 
 DATA: ${getCurrentDate()}
@@ -114,6 +159,10 @@ ENDEREÇO: ${formData.endereco}
 
 MENSAGEM:
 ${formData.mensagem}
+
+___________________________________________
+Este documento foi gerado automaticamente pelo Sistema de Solicitações da Prefeitura Municipal
+Gerado em: ${new Date().toLocaleString('pt-BR')}
     `;
 
     const blob = new Blob([content], { type: 'application/msword' });
@@ -122,6 +171,10 @@ ${formData.mensagem}
 
   const generateExcel = () => {
     const data = [
+      ['PREFEITURA MUNICIPAL'],
+      ['SECRETARIA DE ADMINISTRAÇÃO'],
+      ['Rua Principal, 123 - Centro - CEP: 12345-678'],
+      [''],
       ['SOLICITAÇÃO DE SERVIÇO'],
       [''],
       ['Data', getCurrentDate()],
@@ -133,7 +186,10 @@ ${formData.mensagem}
       ['Telefone', formData.telefone],
       ['Endereço', formData.endereco],
       [''],
-      ['Mensagem', formData.mensagem]
+      ['Mensagem', formData.mensagem],
+      [''],
+      ['Este documento foi gerado automaticamente pelo Sistema de Solicitações da Prefeitura Municipal'],
+      ['Gerado em:', new Date().toLocaleString('pt-BR')]
     ];
 
     const ws = XLSX.utils.aoa_to_sheet(data);
@@ -149,7 +205,7 @@ ${formData.mensagem}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
             <img 
-              src="/public/lovable-uploads/007f16c7-9a20-4239-954a-386da9c3b0b4.png" 
+              src="/lovable-uploads/007f16c7-9a20-4239-954a-386da9c3b0b4.png" 
               alt="Prefeitura" 
               className="w-16 h-16"
             />
@@ -285,8 +341,20 @@ ${formData.mensagem}
               {showPreview && (
                 <CardContent>
                   <div className="bg-white p-6 border rounded-lg text-sm">
-                    <div className="text-center mb-6">
-                      <h3 className="font-bold text-lg">PREFEITURA MUNICIPAL</h3>
+                    <div className="flex items-center gap-3 mb-4">
+                      <img 
+                        src="/lovable-uploads/007f16c7-9a20-4239-954a-386da9c3b0b4.png" 
+                        alt="Brasão" 
+                        className="w-12 h-12"
+                      />
+                      <div>
+                        <h3 className="font-bold text-lg">PREFEITURA MUNICIPAL</h3>
+                        <p className="text-sm">SECRETARIA DE ADMINISTRAÇÃO</p>
+                        <p className="text-xs text-gray-600">Rua Principal, 123 - Centro - CEP: 12345-678</p>
+                      </div>
+                    </div>
+                    
+                    <div className="text-center mb-4">
                       <h4 className="font-bold">SOLICITAÇÃO DE SERVIÇO</h4>
                     </div>
                     
