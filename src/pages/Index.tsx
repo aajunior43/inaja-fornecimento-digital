@@ -331,14 +331,25 @@ const Index = () => {
             },
           },
           children: [
-            // Cabeçalho
+            // Cabeçalho sem logo - mais limpo e funcional
             new Paragraph({
               children: [
                 new TextRun({
                   text: "PREFEITURA MUNICIPAL DE INAJÁ",
                   bold: true,
-                  size: 28,
+                  size: 32,
                   color: "344A5E",
+                }),
+              ],
+              alignment: AlignmentType.CENTER,
+              spacing: { after: 300 },
+            }),
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "Estado do Paraná",
+                  size: 20,
+                  color: "666666",
                 }),
               ],
               alignment: AlignmentType.CENTER,
@@ -352,6 +363,18 @@ const Index = () => {
             new Paragraph({
               text: "Telefone: (44) 3112-4320 | E-mail: prefeito@inaja.pr.gov.br",
               alignment: AlignmentType.CENTER,
+              spacing: { after: 600 },
+            }),
+            
+            // Linha decorativa usando caracteres
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: "═════════════════════════════════════════════════════════════",
+                  color: "344A5E",
+                }),
+              ],
+              alignment: AlignmentType.CENTER,
               spacing: { after: 400 },
             }),
             
@@ -361,33 +384,33 @@ const Index = () => {
                 new TextRun({
                   text: "SOLICITAÇÃO DE FORNECIMENTO",
                   bold: true,
-                  size: 24,
+                  size: 28,
                   color: "344A5E",
                 }),
               ],
               alignment: AlignmentType.CENTER,
-              spacing: { after: 400 },
+              spacing: { after: 600 },
             }),
             
             // Informações do formulário
             new Paragraph({
               children: [
-                new TextRun({ text: "Solicitante: ", bold: true }),
-                new TextRun({ text: formData.nomeSolicitante }),
+                new TextRun({ text: "Solicitante: ", bold: true, size: 24 }),
+                new TextRun({ text: formData.nomeSolicitante, size: 24 }),
               ],
               spacing: { after: 200 },
             }),
             new Paragraph({
               children: [
-                new TextRun({ text: "Empresa: ", bold: true }),
-                new TextRun({ text: formData.nomeEmpresa }),
+                new TextRun({ text: "Empresa: ", bold: true, size: 24 }),
+                new TextRun({ text: formData.nomeEmpresa, size: 24 }),
               ],
               spacing: { after: 200 },
             }),
             new Paragraph({
               children: [
-                new TextRun({ text: "Data: ", bold: true }),
-                new TextRun({ text: formData.dataSolicitacao }),
+                new TextRun({ text: "Data: ", bold: true, size: 24 }),
+                new TextRun({ text: formData.dataSolicitacao, size: 24 }),
               ],
               spacing: { after: 400 },
             }),
@@ -412,42 +435,42 @@ const Index = () => {
                   children: [
                     new TableCell({ 
                       children: [new Paragraph({ 
-                        children: [new TextRun({ text: "ITEM", bold: true })],
+                        children: [new TextRun({ text: "ITEM", bold: true, size: 20 })],
                         alignment: AlignmentType.CENTER,
                       })],
-                      shading: { fill: "F5F5F5" },
+                      shading: { fill: "E8E8E8" },
                       width: { size: 15, type: WidthType.PERCENTAGE },
                     }),
                     new TableCell({ 
                       children: [new Paragraph({ 
-                        children: [new TextRun({ text: "DESCRIÇÃO", bold: true })],
+                        children: [new TextRun({ text: "DESCRIÇÃO", bold: true, size: 20 })],
                         alignment: AlignmentType.CENTER,
                       })],
-                      shading: { fill: "F5F5F5" },
+                      shading: { fill: "E8E8E8" },
                       width: { size: 40, type: WidthType.PERCENTAGE },
                     }),
                     new TableCell({ 
                       children: [new Paragraph({ 
-                        children: [new TextRun({ text: "QTD", bold: true })],
+                        children: [new TextRun({ text: "QTD", bold: true, size: 20 })],
                         alignment: AlignmentType.CENTER,
                       })],
-                      shading: { fill: "F5F5F5" },
+                      shading: { fill: "E8E8E8" },
                       width: { size: 15, type: WidthType.PERCENTAGE },
                     }),
                     new TableCell({ 
                       children: [new Paragraph({ 
-                        children: [new TextRun({ text: "VALOR UNIT.", bold: true })],
+                        children: [new TextRun({ text: "VALOR UNIT.", bold: true, size: 20 })],
                         alignment: AlignmentType.CENTER,
                       })],
-                      shading: { fill: "F5F5F5" },
+                      shading: { fill: "E8E8E8" },
                       width: { size: 15, type: WidthType.PERCENTAGE },
                     }),
                     new TableCell({ 
                       children: [new Paragraph({ 
-                        children: [new TextRun({ text: "VALOR TOTAL", bold: true })],
+                        children: [new TextRun({ text: "VALOR TOTAL", bold: true, size: 20 })],
                         alignment: AlignmentType.CENTER,
                       })],
-                      shading: { fill: "F5F5F5" },
+                      shading: { fill: "E8E8E8" },
                       width: { size: 15, type: WidthType.PERCENTAGE },
                     }),
                   ],
@@ -456,26 +479,30 @@ const Index = () => {
                 ...items.map((item) => new TableRow({
                   children: [
                     new TableCell({ 
-                      children: [new Paragraph(item.item)],
-                    }),
-                    new TableCell({ 
-                      children: [new Paragraph(item.descricao)],
+                      children: [new Paragraph({ 
+                        children: [new TextRun({ text: item.item, size: 18 })],
+                      })],
                     }),
                     new TableCell({ 
                       children: [new Paragraph({ 
-                        text: item.quantidade.toString(),
+                        children: [new TextRun({ text: item.descricao, size: 18 })],
+                      })],
+                    }),
+                    new TableCell({ 
+                      children: [new Paragraph({ 
+                        children: [new TextRun({ text: item.quantidade.toString(), size: 18 })],
                         alignment: AlignmentType.CENTER,
                       })],
                     }),
                     new TableCell({ 
                       children: [new Paragraph({ 
-                        text: `R$ ${item.valorUnitario.toFixed(2)}`,
+                        children: [new TextRun({ text: `R$ ${item.valorUnitario.toFixed(2)}`, size: 18 })],
                         alignment: AlignmentType.RIGHT,
                       })],
                     }),
                     new TableCell({ 
                       children: [new Paragraph({ 
-                        text: `R$ ${item.valorTotal.toFixed(2)}`,
+                        children: [new TextRun({ text: `R$ ${item.valorTotal.toFixed(2)}`, size: 18 })],
                         alignment: AlignmentType.RIGHT,
                       })],
                     }),
@@ -485,23 +512,19 @@ const Index = () => {
                 new TableRow({
                   children: [
                     new TableCell({ 
-                      children: [new Paragraph("")],
-                      columnSpan: 4,
-                      shading: { fill: "DCDCDC" },
-                    }),
-                    new TableCell({ 
                       children: [new Paragraph({ 
-                        children: [new TextRun({ text: "TOTAL GERAL:", bold: true })],
-                        alignment: AlignmentType.CENTER,
-                      })],
-                      shading: { fill: "DCDCDC" },
-                    }),
-                    new TableCell({ 
-                      children: [new Paragraph({ 
-                        children: [new TextRun({ text: `R$ ${getTotalGeral().toFixed(2)}`, bold: true })],
+                        children: [new TextRun({ text: "TOTAL GERAL:", bold: true, size: 20 })],
                         alignment: AlignmentType.RIGHT,
                       })],
-                      shading: { fill: "DCDCDC" },
+                      columnSpan: 4,
+                      shading: { fill: "D0D0D0" },
+                    }),
+                    new TableCell({ 
+                      children: [new Paragraph({ 
+                        children: [new TextRun({ text: `R$ ${getTotalGeral().toFixed(2)}`, bold: true, size: 20 })],
+                        alignment: AlignmentType.RIGHT,
+                      })],
+                      shading: { fill: "D0D0D0" },
                     }),
                   ],
                 }),
@@ -515,11 +538,11 @@ const Index = () => {
             }),
             ...(formData.observacoes ? [
               new Paragraph({
-                children: [new TextRun({ text: "OBSERVAÇÕES:", bold: true })],
+                children: [new TextRun({ text: "OBSERVAÇÕES:", bold: true, size: 24 })],
                 spacing: { after: 200 },
               }),
               new Paragraph({
-                text: formData.observacoes,
+                children: [new TextRun({ text: formData.observacoes, size: 20 })],
                 spacing: { after: 400 },
               }),
             ] : []),
@@ -530,12 +553,12 @@ const Index = () => {
               spacing: { after: 800 },
             }),
             new Paragraph({
-              text: "_________________________________",
+              children: [new TextRun({ text: "_".repeat(50), size: 20 })],
               alignment: AlignmentType.CENTER,
               spacing: { after: 200 },
             }),
             new Paragraph({
-              text: "Assinatura do Solicitante",
+              children: [new TextRun({ text: "Assinatura do Solicitante", size: 18 })],
               alignment: AlignmentType.CENTER,
             }),
             new Paragraph({
@@ -543,7 +566,10 @@ const Index = () => {
               spacing: { after: 400 },
             }),
             new Paragraph({
-              text: `Inajá - PR, ${format(new Date(), 'dd/MM/yyyy', { locale: ptBR })}`,
+              children: [new TextRun({ 
+                text: `Inajá - PR, ${format(new Date(), 'dd/MM/yyyy', { locale: ptBR })}`,
+                size: 18 
+              })],
               alignment: AlignmentType.CENTER,
             }),
           ],
