@@ -6,32 +6,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Trash2, Plus, Building } from 'lucide-react';
-
-interface Supplier {
-  id: string;
-  name: string;
-  cnpj: string;
-  contact: string;
-  email: string;
-}
+import { useSystemConfig } from '@/contexts/SystemConfigContext';
 
 const SuppliersManagement = () => {
-  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const { config, addSupplier, removeSupplier } = useSystemConfig();
   const [newSupplier, setNewSupplier] = useState({ name: '', cnpj: '', contact: '', email: '' });
 
-  const addSupplier = () => {
+  const handleAdd = () => {
     if (newSupplier.name && newSupplier.cnpj) {
-      const supplier: Supplier = {
-        id: Date.now().toString(),
-        ...newSupplier
-      };
-      setSuppliers([...suppliers, supplier]);
+      addSupplier(newSupplier);
       setNewSupplier({ name: '', cnpj: '', contact: '', email: '' });
     }
-  };
-
-  const removeSupplier = (id: string) => {
-    setSuppliers(suppliers.filter(s => s.id !== id));
   };
 
   return (
@@ -84,7 +69,7 @@ const SuppliersManagement = () => {
               />
             </div>
             <div className="md:col-span-2">
-              <Button onClick={addSupplier} className="w-full">
+              <Button onClick={handleAdd} className="w-full">
                 <Plus className="h-4 w-4 mr-2" />
                 Adicionar Fornecedor
               </Button>
@@ -92,7 +77,7 @@ const SuppliersManagement = () => {
           </div>
 
           {/* Lista de fornecedores */}
-          {suppliers.length > 0 && (
+          {config.suppliers.length > 0 && (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -104,7 +89,7 @@ const SuppliersManagement = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {suppliers.map((supplier) => (
+                {config.suppliers.map((supplier) => (
                   <TableRow key={supplier.id}>
                     <TableCell>{supplier.name}</TableCell>
                     <TableCell>{supplier.cnpj}</TableCell>

@@ -1,26 +1,26 @@
 
-import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Settings, Save } from 'lucide-react';
+import { useSystemConfig } from '@/contexts/SystemConfigContext';
+import { useToast } from '@/hooks/use-toast';
 
 const SystemSettings = () => {
-  const [settings, setSettings] = useState({
-    municipalityName: 'Prefeitura Municipal de Inajá-PE',
-    address: '',
-    phone: '',
-    email: '',
-    logo: '',
-    description: 'Sistema de Gestão de Solicitações'
-  });
+  const { config, updateConfig } = useSystemConfig();
+  const { toast } = useToast();
 
   const handleSave = () => {
-    // Aqui você salvaria as configurações
-    console.log('Configurações salvas:', settings);
-    alert('Configurações salvas com sucesso!');
+    toast({
+      title: "Configurações salvas",
+      description: "As configurações do sistema foram atualizadas com sucesso.",
+    });
+  };
+
+  const handleChange = (field: string, value: string) => {
+    updateConfig({ [field]: value });
   };
 
   return (
@@ -38,8 +38,8 @@ const SystemSettings = () => {
               <Label htmlFor="municipality">Nome da Prefeitura</Label>
               <Input
                 id="municipality"
-                value={settings.municipalityName}
-                onChange={(e) => setSettings({...settings, municipalityName: e.target.value})}
+                value={config.municipalityName}
+                onChange={(e) => handleChange('municipalityName', e.target.value)}
                 placeholder="Nome oficial da prefeitura"
               />
             </div>
@@ -47,9 +47,9 @@ const SystemSettings = () => {
               <Label htmlFor="phone">Telefone</Label>
               <Input
                 id="phone"
-                value={settings.phone}
-                onChange={(e) => setSettings({...settings, phone: e.target.value})}
-                placeholder="(87) 0000-0000"
+                value={config.phone}
+                onChange={(e) => handleChange('phone', e.target.value)}
+                placeholder="(44) 0000-0000"
               />
             </div>
             <div>
@@ -57,17 +57,17 @@ const SystemSettings = () => {
               <Input
                 id="email"
                 type="email"
-                value={settings.email}
-                onChange={(e) => setSettings({...settings, email: e.target.value})}
-                placeholder="contato@inaja.pe.gov.br"
+                value={config.email}
+                onChange={(e) => handleChange('email', e.target.value)}
+                placeholder="contato@inaja.pr.gov.br"
               />
             </div>
             <div>
               <Label htmlFor="logo">URL do Logotipo</Label>
               <Input
                 id="logo"
-                value={settings.logo}
-                onChange={(e) => setSettings({...settings, logo: e.target.value})}
+                value={config.logo}
+                onChange={(e) => handleChange('logo', e.target.value)}
                 placeholder="https://exemplo.com/logo.png"
               />
             </div>
@@ -77,8 +77,8 @@ const SystemSettings = () => {
             <Label htmlFor="address">Endereço Completo</Label>
             <Textarea
               id="address"
-              value={settings.address}
-              onChange={(e) => setSettings({...settings, address: e.target.value})}
+              value={config.address}
+              onChange={(e) => handleChange('address', e.target.value)}
               placeholder="Endereço completo da prefeitura"
               rows={2}
             />
@@ -88,8 +88,8 @@ const SystemSettings = () => {
             <Label htmlFor="description">Descrição do Sistema</Label>
             <Textarea
               id="description"
-              value={settings.description}
-              onChange={(e) => setSettings({...settings, description: e.target.value})}
+              value={config.description}
+              onChange={(e) => handleChange('description', e.target.value)}
               placeholder="Descrição que aparecerá no sistema"
               rows={3}
             />

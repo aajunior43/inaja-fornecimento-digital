@@ -6,31 +6,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Trash2, Plus } from 'lucide-react';
-
-interface Orderer {
-  id: string;
-  name: string;
-  position: string;
-  department: string;
-}
+import { useSystemConfig } from '@/contexts/SystemConfigContext';
 
 const OrderersManagement = () => {
-  const [orderers, setOrderers] = useState<Orderer[]>([]);
+  const { config, addOrderer, removeOrderer } = useSystemConfig();
   const [newOrderer, setNewOrderer] = useState({ name: '', position: '', department: '' });
 
-  const addOrderer = () => {
+  const handleAdd = () => {
     if (newOrderer.name && newOrderer.position && newOrderer.department) {
-      const orderer: Orderer = {
-        id: Date.now().toString(),
-        ...newOrderer
-      };
-      setOrderers([...orderers, orderer]);
+      addOrderer(newOrderer);
       setNewOrderer({ name: '', position: '', department: '' });
     }
-  };
-
-  const removeOrderer = (id: string) => {
-    setOrderers(orderers.filter(o => o.id !== id));
   };
 
   return (
@@ -73,7 +59,7 @@ const OrderersManagement = () => {
               />
             </div>
             <div className="md:col-span-3">
-              <Button onClick={addOrderer} className="w-full">
+              <Button onClick={handleAdd} className="w-full">
                 <Plus className="h-4 w-4 mr-2" />
                 Adicionar Ordenador
               </Button>
@@ -81,7 +67,7 @@ const OrderersManagement = () => {
           </div>
 
           {/* Lista de ordenadores */}
-          {orderers.length > 0 && (
+          {config.orderers.length > 0 && (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -92,7 +78,7 @@ const OrderersManagement = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {orderers.map((orderer) => (
+                {config.orderers.map((orderer) => (
                   <TableRow key={orderer.id}>
                     <TableCell>{orderer.name}</TableCell>
                     <TableCell>{orderer.position}</TableCell>
