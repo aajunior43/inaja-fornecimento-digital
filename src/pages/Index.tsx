@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { Plus, Minus, FileText, Download, Trash2, Eye, Menu, Building2, User, Calendar, FileEdit } from "lucide-react";
+import { Plus, Minus, FileText, Download, Trash2, Eye, Menu, Building2, User, Calendar, FileEdit, Settings } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
@@ -14,6 +14,9 @@ import jsPDF from 'jspdf';
 import * as XLSX from 'xlsx';
 import { Document, Packer, Paragraph, Table, TableCell, TableRow, WidthType, AlignmentType, BorderStyle, TextRun, ImageRun } from 'docx';
 import { saveAs } from 'file-saver';
+import { FontSizeControl } from "@/components/FontSizeControl";
+import { TemplateManager } from "@/components/TemplateManager";
+import { TemplateData } from "@/hooks/useTemplates";
 
 interface Item {
   id: string;
@@ -54,6 +57,8 @@ const Index = () => {
 
   const [showPreview, setShowPreview] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [fontSize, setFontSize] = useState(12);
+  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
 
   const addItem = () => {
     const newItem: Item = {
@@ -109,6 +114,15 @@ const Index = () => {
 
   const getTotalGeral = () => {
     return items.reduce((total, item) => total + item.valorTotal, 0);
+  };
+
+  const handleLoadTemplate = (template: TemplateData) => {
+    setFormData(template.formData);
+    setItems(template.items);
+    toast({
+      title: "Modelo carregado",
+      description: `O modelo "${template.name}" foi aplicado com sucesso!`,
+    });
   };
 
   const exportToPDF = () => {
@@ -168,13 +182,13 @@ const Index = () => {
       doc.line(20, 48, 190, 48);
       
       // Título do documento sem caixa colorida
-      doc.setFontSize(14);
+      doc.setFontSize(fontSize + 2);
       doc.setFont("helvetica", "bold");
       doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-      doc.text("SOLICITAÇÃO DE FORNECIMENTO", 105, 60, { align: "center" });
+      doc.text("SOLICITAÇÃO DE AQUISIÇÃO DE PRODUTOS OU SERVIÇOS", 105, 60, { align: "center" });
       
       // Dados do formulário em formato mais limpo
-      doc.setFontSize(10);
+      doc.setFontSize(fontSize - 2);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(0, 0, 0);
       
@@ -206,7 +220,7 @@ const Index = () => {
       doc.rect(20, yPosition, 170, 10, 'F');
       
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(9);
+      doc.setFontSize(fontSize - 3);
       doc.setTextColor(0, 0, 0);
       
       // Desenhar bordas do cabeçalho
@@ -231,6 +245,7 @@ const Index = () => {
       doc.setFont("helvetica", "normal");
       doc.setTextColor(0, 0, 0);
       doc.setDrawColor(0, 0, 0);
+      doc.setFontSize(fontSize - 4);
       
       items.forEach((item, index) => {
         if (yPosition > 250) {
@@ -281,6 +296,7 @@ const Index = () => {
       if (formData.observacoes) {
         doc.setDrawColor(200, 200, 200);
         doc.setTextColor(0, 0, 0);
+        doc.setFontSize(fontSize - 2);
         
         const observHeight = Math.max(20, doc.splitTextToSize(formData.observacoes, 160).length * 5 + 10);
         doc.rect(20, yPosition, 170, observHeight, 'S');
@@ -302,14 +318,14 @@ const Index = () => {
       doc.setLineWidth(1);
       doc.line(60, yPosition, 150, yPosition);
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
+      doc.setFontSize(fontSize - 2);
       doc.text("Assinatura do Solicitante", 105, yPosition + 8, { align: "center" });
       
       // Data e local
       yPosition += 25;
       doc.text(`Inajá - PR, ${format(new Date(), 'dd/MM/yyyy', { locale: ptBR })}`, 105, yPosition, { align: "center" });
       
-      doc.save(`Solicitacao_Fornecimento_${formData.dataSolicitacao.replace(/\//g, '')}.pdf`);
+      doc.save(`Solicitacao_Aquisicao_${formData.dataSolicitacao.replace(/\//g, '')}.pdf`);
       
       toast({
         title: "PDF exportado",
@@ -368,7 +384,7 @@ const Index = () => {
                 new TextRun({
                   text: "PREFEITURA MUNICIPAL DE INAJÁ",
                   bold: true,
-                  size: 32,
+                  size: Math.round(fontSize * 1.5),
                   color: "344A5E",
                 }),
               ],
@@ -379,7 +395,7 @@ const Index = () => {
               children: [
                 new TextRun({
                   text: "Estado do Paraná",
-                  size: 20,
+                  size: Math.round(fontSize * 0.8),
                   color: "666666",
                 }),
               ],
@@ -413,9 +429,9 @@ const Index = () => {
             new Paragraph({
               children: [
                 new TextRun({
-                  text: "SOLICITAÇÃO DE FORNECIMENTO",
+                  text: "SOLICITAÇÃO DE AQUISIÇÃO DE PRODUTOS OU SERVIÇOS",
                   bold: true,
-                  size: 28,
+                  size: Math.round(fontSize * 1.2),
                   color: "344A5E",
                 }),
               ],
@@ -426,22 +442,22 @@ const Index = () => {
             // Informações do formulário
             new Paragraph({
               children: [
-                new TextRun({ text: "Solicitante: ", bold: true, size: 24 }),
-                new TextRun({ text: formData.nomeSolicitante, size: 24 }),
+                new TextRun({ text: "Solicitante: ", bold: true, size: fontSize }),
+                new TextRun({ text: formData.nomeSolicitante, size: fontSize }),
               ],
               spacing: { after: 200 },
             }),
             new Paragraph({
               children: [
-                new TextRun({ text: "Empresa: ", bold: true, size: 24 }),
-                new TextRun({ text: formData.nomeEmpresa, size: 24 }),
+                new TextRun({ text: "Empresa: ", bold: true, size: fontSize }),
+                new TextRun({ text: formData.nomeEmpresa, size: fontSize }),
               ],
               spacing: { after: 200 },
             }),
             new Paragraph({
               children: [
-                new TextRun({ text: "Data: ", bold: true, size: 24 }),
-                new TextRun({ text: formData.dataSolicitacao, size: 24 }),
+                new TextRun({ text: "Data: ", bold: true, size: fontSize }),
+                new TextRun({ text: formData.dataSolicitacao, size: fontSize }),
               ],
               spacing: { after: 400 },
             }),
@@ -466,7 +482,7 @@ const Index = () => {
                   children: [
                     new TableCell({ 
                       children: [new Paragraph({ 
-                        children: [new TextRun({ text: "ITEM", bold: true, size: 20 })],
+                        children: [new TextRun({ text: "ITEM", bold: true, size: Math.round(fontSize * 0.8) })],
                         alignment: AlignmentType.CENTER,
                       })],
                       shading: { fill: "E8E8E8" },
@@ -474,7 +490,7 @@ const Index = () => {
                     }),
                     new TableCell({ 
                       children: [new Paragraph({ 
-                        children: [new TextRun({ text: "DESCRIÇÃO", bold: true, size: 20 })],
+                        children: [new TextRun({ text: "DESCRIÇÃO", bold: true, size: Math.round(fontSize * 0.8) })],
                         alignment: AlignmentType.CENTER,
                       })],
                       shading: { fill: "E8E8E8" },
@@ -482,7 +498,7 @@ const Index = () => {
                     }),
                     new TableCell({ 
                       children: [new Paragraph({ 
-                        children: [new TextRun({ text: "QTD", bold: true, size: 20 })],
+                        children: [new TextRun({ text: "QTD", bold: true, size: Math.round(fontSize * 0.8) })],
                         alignment: AlignmentType.CENTER,
                       })],
                       shading: { fill: "E8E8E8" },
@@ -490,7 +506,7 @@ const Index = () => {
                     }),
                     new TableCell({ 
                       children: [new Paragraph({ 
-                        children: [new TextRun({ text: "VALOR UNIT.", bold: true, size: 20 })],
+                        children: [new TextRun({ text: "VALOR UNIT.", bold: true, size: Math.round(fontSize * 0.8) })],
                         alignment: AlignmentType.CENTER,
                       })],
                       shading: { fill: "E8E8E8" },
@@ -498,7 +514,7 @@ const Index = () => {
                     }),
                     new TableCell({ 
                       children: [new Paragraph({ 
-                        children: [new TextRun({ text: "VALOR TOTAL", bold: true, size: 20 })],
+                        children: [new TextRun({ text: "VALOR TOTAL", bold: true, size: Math.round(fontSize * 0.8) })],
                         alignment: AlignmentType.CENTER,
                       })],
                       shading: { fill: "E8E8E8" },
@@ -511,29 +527,29 @@ const Index = () => {
                   children: [
                     new TableCell({ 
                       children: [new Paragraph({ 
-                        children: [new TextRun({ text: item.item, size: 18 })],
+                        children: [new TextRun({ text: item.item, size: Math.round(fontSize * 0.75) })],
                       })],
                     }),
                     new TableCell({ 
                       children: [new Paragraph({ 
-                        children: [new TextRun({ text: item.descricao, size: 18 })],
+                        children: [new TextRun({ text: item.descricao, size: Math.round(fontSize * 0.75) })],
                       })],
                     }),
                     new TableCell({ 
                       children: [new Paragraph({ 
-                        children: [new TextRun({ text: item.quantidade.toString(), size: 18 })],
+                        children: [new TextRun({ text: item.quantidade.toString(), size: Math.round(fontSize * 0.75) })],
                         alignment: AlignmentType.CENTER,
                       })],
                     }),
                     new TableCell({ 
                       children: [new Paragraph({ 
-                        children: [new TextRun({ text: `R$ ${item.valorUnitario.toFixed(2)}`, size: 18 })],
+                        children: [new TextRun({ text: `R$ ${item.valorUnitario.toFixed(2)}`, size: Math.round(fontSize * 0.75) })],
                         alignment: AlignmentType.RIGHT,
                       })],
                     }),
                     new TableCell({ 
                       children: [new Paragraph({ 
-                        children: [new TextRun({ text: `R$ ${item.valorTotal.toFixed(2)}`, size: 18 })],
+                        children: [new TextRun({ text: `R$ ${item.valorTotal.toFixed(2)}`, size: Math.round(fontSize * 0.75) })],
                         alignment: AlignmentType.RIGHT,
                       })],
                     }),
@@ -544,7 +560,7 @@ const Index = () => {
                   children: [
                     new TableCell({ 
                       children: [new Paragraph({ 
-                        children: [new TextRun({ text: "TOTAL GERAL:", bold: true, size: 20 })],
+                        children: [new TextRun({ text: "TOTAL GERAL:", bold: true, size: Math.round(fontSize * 0.8) })],
                         alignment: AlignmentType.RIGHT,
                       })],
                       columnSpan: 4,
@@ -552,7 +568,7 @@ const Index = () => {
                     }),
                     new TableCell({ 
                       children: [new Paragraph({ 
-                        children: [new TextRun({ text: `R$ ${getTotalGeral().toFixed(2)}`, bold: true, size: 20 })],
+                        children: [new TextRun({ text: `R$ ${getTotalGeral().toFixed(2)}`, bold: true, size: Math.round(fontSize * 0.8) })],
                         alignment: AlignmentType.RIGHT,
                       })],
                       shading: { fill: "D0D0D0" },
@@ -569,11 +585,11 @@ const Index = () => {
             }),
             ...(formData.observacoes ? [
               new Paragraph({
-                children: [new TextRun({ text: "OBSERVAÇÕES:", bold: true, size: 24 })],
+                children: [new TextRun({ text: "OBSERVAÇÕES:", bold: true, size: fontSize })],
                 spacing: { after: 200 },
               }),
               new Paragraph({
-                children: [new TextRun({ text: formData.observacoes, size: 20 })],
+                children: [new TextRun({ text: formData.observacoes, size: Math.round(fontSize * 0.8) })],
                 spacing: { after: 400 },
               }),
             ] : []),
@@ -584,12 +600,12 @@ const Index = () => {
               spacing: { after: 800 },
             }),
             new Paragraph({
-              children: [new TextRun({ text: "_".repeat(50), size: 20 })],
+              children: [new TextRun({ text: "_".repeat(50), size: fontSize })],
               alignment: AlignmentType.CENTER,
               spacing: { after: 200 },
             }),
             new Paragraph({
-              children: [new TextRun({ text: "Assinatura do Solicitante", size: 18 })],
+              children: [new TextRun({ text: "Assinatura do Solicitante", size: Math.round(fontSize * 0.75) })],
               alignment: AlignmentType.CENTER,
             }),
             new Paragraph({
@@ -599,7 +615,7 @@ const Index = () => {
             new Paragraph({
               children: [new TextRun({ 
                 text: `Inajá - PR, ${format(new Date(), 'dd/MM/yyyy', { locale: ptBR })}`,
-                size: 18 
+                size: Math.round(fontSize * 0.75)
               })],
               alignment: AlignmentType.CENTER,
             }),
@@ -609,7 +625,7 @@ const Index = () => {
 
       // Usar abordagem mais compatível com browser
       const blob = await Packer.toBlob(doc);
-      saveAs(blob, `Solicitacao_Fornecimento_${formData.dataSolicitacao.replace(/\//g, '')}.docx`);
+      saveAs(blob, `Solicitacao_Aquisicao_${formData.dataSolicitacao.replace(/\//g, '')}.docx`);
       
       toast({
         title: "Word exportado",
@@ -628,7 +644,7 @@ const Index = () => {
   const exportToExcel = () => {
     const worksheetData = [
       ['PREFEITURA MUNICIPAL DE INAJÁ'],
-      ['SOLICITAÇÃO DE FORNECIMENTO'],
+      ['SOLICITAÇÃO DE AQUISIÇÃO DE PRODUTOS OU SERVIÇOS'],
       [],
       ['Solicitante:', formData.nomeSolicitante],
       ['Empresa:', formData.nomeEmpresa],
@@ -652,7 +668,7 @@ const Index = () => {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Solicitação');
     
-    XLSX.writeFile(workbook, `Solicitacao_Fornecimento_${formData.dataSolicitacao.replace(/\//g, '')}.xlsx`);
+    XLSX.writeFile(workbook, `Solicitacao_Aquisicao_${formData.dataSolicitacao.replace(/\//g, '')}.xlsx`);
     
     toast({
       title: "Excel exportado",
@@ -678,13 +694,32 @@ const Index = () => {
               </div>
               <div className="text-center sm:text-left">
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">
-                  Sistema de Solicitação de Fornecimento
+                  Sistema de Solicitação de Aquisição
                 </h1>
                 <p className="text-slate-300 text-sm sm:text-base flex items-center justify-center sm:justify-start">
                   <Building2 className="w-4 h-4 mr-2 text-blue-400" />
                   Prefeitura Municipal de Inajá - PR
                 </p>
               </div>
+            </div>
+            <div className="flex justify-center space-x-2">
+              <Button 
+                onClick={() => navigate('/memorandos')} 
+                className="bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-sm shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                size="sm"
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                Memorandos Internos
+              </Button>
+              <Button
+                onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}
+                variant="outline"
+                size="sm"
+                className="border-slate-600 text-slate-300 hover:bg-slate-700"
+              >
+                <Settings className="mr-2 h-4 w-4" />
+                Opções Avançadas
+              </Button>
             </div>
           </div>
         </div>
@@ -700,7 +735,7 @@ const Index = () => {
                   <CardHeader className="relative border-b border-slate-700/50 bg-slate-800/50">
                     <CardTitle className="text-blue-400 flex items-center text-lg sm:text-xl">
                       <FileText className="mr-3 h-6 w-6 text-blue-400" />
-                      Dados da Solicitação
+                      Dados da Solicitação de Aquisição
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="relative space-y-6 p-6">
@@ -721,14 +756,14 @@ const Index = () => {
                       <div className="space-y-2">
                         <Label htmlFor="empresa" className="text-slate-300 text-sm sm:text-base flex items-center">
                           <Building2 className="w-4 h-4 mr-2 text-blue-400" />
-                          Nome da Empresa
+                          Nome da Empresa/Departamento
                         </Label>
                         <Input
                           id="empresa"
                           value={formData.nomeEmpresa}
                           onChange={(e) => setFormData({ ...formData, nomeEmpresa: e.target.value })}
                           className="bg-slate-700/80 border-slate-600/50 text-slate-100 text-sm sm:text-base focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200"
-                          placeholder="Digite o nome da empresa"
+                          placeholder="Digite o nome da empresa ou departamento"
                         />
                       </div>
                     </div>
@@ -764,7 +799,7 @@ const Index = () => {
               </div>
 
               {/* Enhanced Actions Panel */}
-              <div className="xl:col-span-1">
+              <div className="xl:col-span-1 space-y-4">
                 <Card className="bg-slate-800/80 backdrop-blur-sm border-slate-700/50 shadow-2xl overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-purple-600/5 to-pink-600/5"></div>
                   <CardHeader className="relative pb-3 border-b border-slate-700/50 bg-slate-800/50">
@@ -829,6 +864,21 @@ const Index = () => {
                     </Button>
                   </CardContent>
                 </Card>
+
+                {/* Advanced Options */}
+                {showAdvancedOptions && (
+                  <>
+                    <FontSizeControl 
+                      fontSize={fontSize} 
+                      onFontSizeChange={setFontSize} 
+                    />
+                    <TemplateManager
+                      formData={formData}
+                      items={items}
+                      onLoadTemplate={handleLoadTemplate}
+                    />
+                  </>
+                )}
               </div>
             </div>
 
@@ -1031,7 +1081,7 @@ const Index = () => {
             </Card>
           </div>
         ) : (
-          // Pré-visualização responsiva
+          // Pré-visualização responsiva com controle de fonte
           <div className="space-y-4 sm:space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
               <Button 
@@ -1057,8 +1107,8 @@ const Index = () => {
               </div>
             </div>
 
-            <Card className="bg-white text-black max-w-4xl mx-auto">
-              <CardContent className="p-4 sm:p-6 lg:p-8">
+            <Card className="bg-white text-black max-w-4xl mx-auto shadow-2xl" style={{ minHeight: '297mm', width: '210mm', margin: '0 auto', transform: 'scale(0.85)' }}>
+              <CardContent className="p-4 sm:p-6 lg:p-8" style={{ fontSize: `${fontSize}px` }}>
                 {/* Cabeçalho do documento responsivo */}
                 <div className="text-center mb-6 sm:mb-8">
                   <div className="flex flex-col sm:flex-row items-center justify-center mb-4 space-y-2 sm:space-y-0">
@@ -1068,19 +1118,19 @@ const Index = () => {
                       className="h-16 w-16 sm:h-20 sm:w-20 sm:mr-4"
                     />
                     <div className="text-center sm:text-left">
-                      <h1 className="text-lg sm:text-xl font-bold">PREFEITURA MUNICIPAL DE INAJÁ</h1>
-                      <p className="text-xs sm:text-sm">Av. Antônio Veiga Martins, 80 - CEP: 87670-000</p>
-                      <p className="text-xs sm:text-sm">Telefone: (44) 3112-4320</p>
-                      <p className="text-xs sm:text-sm">E-mail: prefeito@inaja.pr.gov.br</p>
+                      <h1 style={{ fontSize: `${fontSize + 4}px` }} className="font-bold">PREFEITURA MUNICIPAL DE INAJÁ</h1>
+                      <p style={{ fontSize: `${fontSize - 2}px` }}>Av. Antônio Veiga Martins, 80 - CEP: 87670-000</p>
+                      <p style={{ fontSize: `${fontSize - 2}px` }}>Telefone: (44) 3112-4320</p>
+                      <p style={{ fontSize: `${fontSize - 2}px` }}>E-mail: prefeito@inaja.pr.gov.br</p>
                     </div>
                   </div>
-                  <h2 className="text-base sm:text-lg font-bold mt-4 sm:mt-6">SOLICITAÇÃO DE FORNECIMENTO</h2>
+                  <h2 style={{ fontSize: `${fontSize + 2}px` }} className="font-bold mt-4 sm:mt-6">SOLICITAÇÃO DE AQUISIÇÃO DE PRODUTOS OU SERVIÇOS</h2>
                 </div>
 
                 {/* Dados do formulário */}
-                <div className="mb-4 sm:mb-6 space-y-1 sm:space-y-2 text-sm sm:text-base">
+                <div className="mb-4 sm:mb-6 space-y-1 sm:space-y-2">
                   <p><strong>Solicitante:</strong> {formData.nomeSolicitante}</p>
-                  <p><strong>Empresa:</strong> {formData.nomeEmpresa}</p>
+                  <p><strong>Empresa/Departamento:</strong> {formData.nomeEmpresa}</p>
                   <p><strong>Data:</strong> {formData.dataSolicitacao}</p>
                 </div>
 
@@ -1088,7 +1138,7 @@ const Index = () => {
                 <div className="mb-4 sm:mb-6">
                   {/* Tabela desktop */}
                   <div className="hidden sm:block overflow-x-auto">
-                    <table className="w-full border-collapse border border-black text-xs sm:text-sm">
+                    <table className="w-full border-collapse border border-black" style={{ fontSize: `${fontSize - 2}px` }}>
                       <thead>
                         <tr className="bg-gray-200">
                           <th className="border border-black p-1 sm:p-2 text-left">ITEM</th>
@@ -1120,7 +1170,7 @@ const Index = () => {
                   <div className="sm:hidden space-y-3">
                     {items.map((item, index) => (
                       <div key={item.id} className="border border-gray-300 p-3 rounded bg-gray-50">
-                        <div className="space-y-2 text-sm">
+                        <div className="space-y-2" style={{ fontSize: `${fontSize - 2}px` }}>
                           <div><strong>Item {index + 1}:</strong> {item.item}</div>
                           <div><strong>Descrição:</strong> {item.descricao}</div>
                           <div className="grid grid-cols-2 gap-2">
@@ -1134,7 +1184,7 @@ const Index = () => {
                       </div>
                     ))}
                     <div className="border-2 border-gray-800 p-3 rounded bg-gray-200">
-                      <div className="text-center font-bold">
+                      <div className="text-center font-bold" style={{ fontSize: `${fontSize}px` }}>
                         TOTAL GERAL: R$ {getTotalGeral().toFixed(2)}
                       </div>
                     </div>
@@ -1143,14 +1193,14 @@ const Index = () => {
 
                 {/* Observações */}
                 {formData.observacoes && (
-                  <div className="mb-6 sm:mb-8 text-sm sm:text-base">
+                  <div className="mb-6 sm:mb-8">
                     <h3 className="font-bold mb-2">OBSERVAÇÕES:</h3>
                     <p className="text-justify break-words">{formData.observacoes}</p>
                   </div>
                 )}
 
                 {/* Espaço para assinatura */}
-                <div className="mt-12 sm:mt-16 text-center text-sm sm:text-base">
+                <div className="mt-12 sm:mt-16 text-center">
                   <div className="border-b border-black w-60 sm:w-80 mx-auto mb-2"></div>
                   <p>Assinatura do Solicitante</p>
                   <p className="mt-6 sm:mt-8">Inajá - PR, {format(new Date(), 'dd/MM/yyyy', { locale: ptBR })}</p>
