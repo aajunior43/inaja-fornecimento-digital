@@ -40,6 +40,7 @@ export const DataManager = ({
   const [newSolicitante, setNewSolicitante] = useState('');
   const [newEmpresa, setNewEmpresa] = useState('');
   const [newObservacao, setNewObservacao] = useState('');
+  const [importing, setImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -76,14 +77,23 @@ export const DataManager = ({
   };
 
   const handleSaveCurrentData = () => {
+    let saved = false;
+    
     if (currentSolicitante?.trim()) {
       addSolicitante(currentSolicitante);
+      saved = true;
     }
     if (currentEmpresa?.trim()) {
       addEmpresa(currentEmpresa);
+      saved = true;
     }
     if (currentObservacao?.trim()) {
       addObservacao(currentObservacao);
+      saved = true;
+    }
+    
+    if (!saved) {
+      console.log('Nenhum dado atual para salvar');
     }
   };
 
@@ -91,14 +101,26 @@ export const DataManager = ({
     const file = event.target.files?.[0];
     if (!file) return;
 
+    setImporting(true);
+    
     try {
       await importData(file);
     } catch (error) {
       console.error('Erro ao importar dados:', error);
+    } finally {
+      setImporting(false);
+      // Limpar o input para permitir reimportar o mesmo arquivo
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
+  };
 
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+  const handleExportData = () => {
+    try {
+      exportData();
+    } catch (error) {
+      console.error('Erro ao exportar dados:', error);
     }
   };
 
@@ -124,10 +146,11 @@ export const DataManager = ({
 
           <div className="grid grid-cols-2 gap-2">
             <Button
-              onClick={exportData}
+              onClick={handleExportData}
               size="sm"
               variant="outline"
               className="border-slate-600 text-slate-300 hover:bg-slate-700"
+              disabled={savedData.solicitantes.length === 0 && savedData.empresas.length === 0 && savedData.observacoes.length === 0}
             >
               <Download className="mr-2 h-3 w-3" />
               Exportar
@@ -136,7 +159,7 @@ export const DataManager = ({
             <input
               ref={fileInputRef}
               type="file"
-              accept=".json"
+              accept=".json,application/json"
               onChange={handleImportData}
               className="hidden"
             />
@@ -145,9 +168,10 @@ export const DataManager = ({
               size="sm"
               variant="outline"
               className="border-slate-600 text-slate-300 hover:bg-slate-700"
+              disabled={importing}
             >
               <Upload className="mr-2 h-3 w-3" />
-              Importar
+              {importing ? 'Importando...' : 'Importar'}
             </Button>
           </div>
         </div>
@@ -158,7 +182,7 @@ export const DataManager = ({
         <div className="space-y-3">
           <Label className="text-slate-300 text-xs flex items-center">
             <User className="w-3 h-3 mr-2 text-cyan-400" />
-            Solicitantes Salvos
+            Solicitantes Salvos ({savedData.solicitantes.length})
           </Label>
           
           <div className="flex space-x-2">
@@ -199,6 +223,9 @@ export const DataManager = ({
                   </Button>
                 </div>
               ))}
+              {savedData.solicitantes.length === 0 && (
+                <p className="text-slate-500 text-xs text-center py-2">Nenhum solicitante salvo</p>
+              )}
             </div>
           </ScrollArea>
         </div>
@@ -209,7 +236,7 @@ export const DataManager = ({
         <div className="space-y-3">
           <Label className="text-slate-300 text-xs flex items-center">
             <Building2 className="w-3 h-3 mr-2 text-cyan-400" />
-            Empresas Salvas
+            Empresas Salvas ({savedData.empresas.length})
           </Label>
           
           <div className="flex space-x-2">
@@ -250,6 +277,9 @@ export const DataManager = ({
                   </Button>
                 </div>
               ))}
+              {savedData.empresas.length === 0 && (
+                <p className="text-slate-500 text-xs text-center py-2">Nenhuma empresa salva</p>
+              )}
             </div>
           </ScrollArea>
         </div>
@@ -260,7 +290,7 @@ export const DataManager = ({
         <div className="space-y-3">
           <Label className="text-slate-300 text-xs flex items-center">
             <FileText className="w-3 h-3 mr-2 text-cyan-400" />
-            Observações Salvas
+            Observações Salvas ({savedData.observacoes.length})
           </Label>
           
           <div className="flex space-x-2">
@@ -301,6 +331,9 @@ export const DataManager = ({
                   </Button>
                 </div>
               ))}
+              {savedData.observacoes.length === 0 && (
+                <p className="text-slate-500 text-xs text-center py-2">Nenhuma observação salva</p>
+              )}
             </div>
           </ScrollArea>
         </div>
