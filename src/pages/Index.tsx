@@ -16,6 +16,7 @@ import { Document, Packer, Paragraph, Table, TableCell, TableRow, WidthType, Ali
 import { saveAs } from 'file-saver';
 import { FontSizeControl } from "@/components/FontSizeControl";
 import { TemplateManager } from "@/components/TemplateManager";
+import { DataManager } from "@/components/DataManager";
 import { TemplateData } from "@/hooks/useTemplates";
 
 interface Item {
@@ -56,7 +57,6 @@ const Index = () => {
   ]);
 
   const [showPreview, setShowPreview] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [fontSize, setFontSize] = useState(12);
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
 
@@ -677,15 +677,15 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900 text-slate-100 p-2 sm:p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-900 text-slate-100 p-2 sm:p-4">
       <div className="max-w-7xl mx-auto">
         {/* Enhanced Header */}
         <div className="text-center mb-6 sm:mb-8 relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-2xl blur-xl"></div>
-          <div className="relative bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 shadow-2xl">
+          <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/20 to-cyan-600/20 rounded-2xl blur-xl"></div>
+          <div className="relative bg-slate-800/60 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 shadow-2xl">
             <div className="flex flex-col sm:flex-row items-center justify-center mb-4 space-y-4 sm:space-y-0">
               <div className="relative">
-                <div className="absolute inset-0 bg-blue-500/30 rounded-full blur-lg"></div>
+                <div className="absolute inset-0 bg-indigo-500/30 rounded-full blur-lg"></div>
                 <img 
                   src="/lovable-uploads/007f16c7-9a20-4239-954a-386da9c3b0b4.png" 
                   alt="Brasão da Prefeitura de Inajá" 
@@ -693,11 +693,11 @@ const Index = () => {
                 />
               </div>
               <div className="text-center sm:text-left">
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-indigo-400 via-cyan-400 to-teal-400 bg-clip-text text-transparent mb-2">
                   Sistema de Solicitação de Aquisição
                 </h1>
                 <p className="text-slate-300 text-sm sm:text-base flex items-center justify-center sm:justify-start">
-                  <Building2 className="w-4 h-4 mr-2 text-blue-400" />
+                  <Building2 className="w-4 h-4 mr-2 text-indigo-400" />
                   Prefeitura Municipal de Inajá - PR
                 </p>
               </div>
@@ -707,7 +707,7 @@ const Index = () => {
                 onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}
                 variant="outline"
                 size="sm"
-                className="border-slate-600 text-slate-300 hover:bg-slate-700 shadow-lg hover:shadow-xl transition-all duration-300"
+                className="border-slate-600 text-slate-300 hover:bg-slate-700/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:border-indigo-500"
               >
                 <Settings className="mr-2 h-4 w-4" />
                 Opções Avançadas
@@ -721,12 +721,12 @@ const Index = () => {
             {/* Enhanced Layout */}
             <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
               {/* Enhanced Main Form */}
-              <div className="xl:col-span-3">
-                <Card className="bg-slate-800/80 backdrop-blur-sm border-slate-700/50 shadow-2xl overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-purple-600/5"></div>
-                  <CardHeader className="relative border-b border-slate-700/50 bg-slate-800/50">
-                    <CardTitle className="text-blue-400 flex items-center text-lg sm:text-xl">
-                      <FileText className="mr-3 h-6 w-6 text-blue-400" />
+              <div className="xl:col-span-2">
+                <Card className="bg-slate-800/90 backdrop-blur-sm border-slate-700/50 shadow-2xl overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/5 to-cyan-600/5"></div>
+                  <CardHeader className="relative border-b border-slate-700/50 bg-slate-800/60">
+                    <CardTitle className="text-indigo-400 flex items-center text-lg sm:text-xl">
+                      <FileText className="mr-3 h-6 w-6 text-indigo-400" />
                       Dados da Solicitação de Aquisição
                     </CardTitle>
                   </CardHeader>
@@ -734,27 +734,27 @@ const Index = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <Label htmlFor="solicitante" className="text-slate-300 text-sm sm:text-base flex items-center">
-                          <User className="w-4 h-4 mr-2 text-blue-400" />
+                          <User className="w-4 h-4 mr-2 text-indigo-400" />
                           Nome do Solicitante
                         </Label>
                         <Input
                           id="solicitante"
                           value={formData.nomeSolicitante}
                           onChange={(e) => setFormData({ ...formData, nomeSolicitante: e.target.value })}
-                          className="bg-slate-700/80 border-slate-600/50 text-slate-100 text-sm sm:text-base focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200"
+                          className="bg-slate-700/80 border-slate-600/50 text-slate-100 text-sm sm:text-base focus:border-indigo-400 focus:ring-indigo-400/20 transition-all duration-200"
                           placeholder="Digite o nome do solicitante"
                         />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="empresa" className="text-slate-300 text-sm sm:text-base flex items-center">
-                          <Building2 className="w-4 h-4 mr-2 text-blue-400" />
+                          <Building2 className="w-4 h-4 mr-2 text-indigo-400" />
                           Nome da Empresa/Departamento
                         </Label>
                         <Input
                           id="empresa"
                           value={formData.nomeEmpresa}
                           onChange={(e) => setFormData({ ...formData, nomeEmpresa: e.target.value })}
-                          className="bg-slate-700/80 border-slate-600/50 text-slate-100 text-sm sm:text-base focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200"
+                          className="bg-slate-700/80 border-slate-600/50 text-slate-100 text-sm sm:text-base focus:border-indigo-400 focus:ring-indigo-400/20 transition-all duration-200"
                           placeholder="Digite o nome da empresa ou departamento"
                         />
                       </div>
@@ -762,27 +762,27 @@ const Index = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <Label htmlFor="data" className="text-slate-300 text-sm sm:text-base flex items-center">
-                          <Calendar className="w-4 h-4 mr-2 text-blue-400" />
+                          <Calendar className="w-4 h-4 mr-2 text-indigo-400" />
                           Data da Solicitação
                         </Label>
                         <Input
                           id="data"
                           value={formData.dataSolicitacao}
                           onChange={(e) => setFormData({ ...formData, dataSolicitacao: e.target.value })}
-                          className="bg-slate-700/80 border-slate-600/50 text-slate-100 text-sm sm:text-base focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200"
+                          className="bg-slate-700/80 border-slate-600/50 text-slate-100 text-sm sm:text-base focus:border-indigo-400 focus:ring-indigo-400/20 transition-all duration-200"
                         />
                       </div>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="observacoes" className="text-slate-300 text-sm sm:text-base flex items-center">
-                        <FileEdit className="w-4 h-4 mr-2 text-blue-400" />
+                        <FileEdit className="w-4 h-4 mr-2 text-indigo-400" />
                         Observações Gerais
                       </Label>
                       <Textarea
                         id="observacoes"
                         value={formData.observacoes}
                         onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
-                        className="bg-slate-700/80 border-slate-600/50 text-slate-100 min-h-[100px] sm:min-h-[120px] text-sm sm:text-base focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200 resize-none"
+                        className="bg-slate-700/80 border-slate-600/50 text-slate-100 min-h-[100px] sm:min-h-[120px] text-sm sm:text-base focus:border-indigo-400 focus:ring-indigo-400/20 transition-all duration-200 resize-none"
                         placeholder="Digite observações adicionais..."
                       />
                     </div>
@@ -791,21 +791,19 @@ const Index = () => {
               </div>
 
               {/* Enhanced Actions Panel */}
-              <div className="xl:col-span-1 space-y-4">
-                <Card className="bg-slate-800/80 backdrop-blur-sm border-slate-700/50 shadow-2xl overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-purple-600/5 to-pink-600/5"></div>
-                  <CardHeader className="relative pb-3 border-b border-slate-700/50 bg-slate-800/50">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-purple-400 text-lg flex items-center">
-                        <Eye className="mr-2 h-5 w-5" />
-                        Ações do Sistema
-                      </CardTitle>
-                    </div>
+              <div className="xl:col-span-2 space-y-4">
+                <Card className="bg-slate-800/90 backdrop-blur-sm border-slate-700/50 shadow-2xl overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-teal-600/5 to-cyan-600/5"></div>
+                  <CardHeader className="relative pb-3 border-b border-slate-700/50 bg-slate-800/60">
+                    <CardTitle className="text-teal-400 text-lg flex items-center">
+                      <Eye className="mr-2 h-5 w-5" />
+                      Ações do Sistema
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="relative space-y-3 p-4">
                     <Button 
                       onClick={() => setShowPreview(true)} 
-                      className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                      className="w-full bg-gradient-to-r from-indigo-600 to-teal-600 hover:from-indigo-700 hover:to-teal-700 text-sm sm:text-base shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                       size="sm"
                     >
                       <Eye className="mr-2 h-4 w-4" />
@@ -814,30 +812,32 @@ const Index = () => {
                     <Separator className="bg-gradient-to-r from-slate-600/50 to-slate-500/50" />
                     <div className="space-y-2">
                       <p className="text-slate-400 text-xs font-medium">Exportar Documento:</p>
-                      <Button 
-                        onClick={exportToPDF} 
-                        className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-sm shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-                        size="sm"
-                      >
-                        <Download className="mr-2 h-4 w-4" />
-                        PDF
-                      </Button>
-                      <Button 
-                        onClick={exportToWord} 
-                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-sm shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-                        size="sm"
-                      >
-                        <Download className="mr-2 h-4 w-4" />
-                        Word
-                      </Button>
-                      <Button 
-                        onClick={exportToExcel} 
-                        className="w-full bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-sm shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-                        size="sm"
-                      >
-                        <Download className="mr-2 h-4 w-4" />
-                        Excel
-                      </Button>
+                      <div className="grid grid-cols-3 gap-2">
+                        <Button 
+                          onClick={exportToPDF} 
+                          className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-xs shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                          size="sm"
+                        >
+                          <Download className="mr-1 h-3 w-3" />
+                          PDF
+                        </Button>
+                        <Button 
+                          onClick={exportToWord} 
+                          className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-xs shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                          size="sm"
+                        >
+                          <Download className="mr-1 h-3 w-3" />
+                          Word
+                        </Button>
+                        <Button 
+                          onClick={exportToExcel} 
+                          className="bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-xs shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                          size="sm"
+                        >
+                          <Download className="mr-1 h-3 w-3" />
+                          Excel
+                        </Button>
+                      </div>
                     </div>
                     <Separator className="bg-gradient-to-r from-slate-600/50 to-slate-500/50" />
                     <Button 
@@ -854,7 +854,15 @@ const Index = () => {
 
                 {/* Advanced Options */}
                 {showAdvancedOptions && (
-                  <>
+                  <div className="grid grid-cols-1 gap-4">
+                    <DataManager
+                      onSelectSolicitante={(nome) => setFormData(prev => ({ ...prev, nomeSolicitante: nome }))}
+                      onSelectEmpresa={(empresa) => setFormData(prev => ({ ...prev, nomeEmpresa: empresa }))}
+                      onSelectObservacao={(observacao) => setFormData(prev => ({ ...prev, observacoes: observacao }))}
+                      currentSolicitante={formData.nomeSolicitante}
+                      currentEmpresa={formData.nomeEmpresa}
+                      currentObservacao={formData.observacoes}
+                    />
                     <FontSizeControl 
                       fontSize={fontSize} 
                       onFontSizeChange={setFontSize} 
@@ -864,23 +872,23 @@ const Index = () => {
                       items={items}
                       onLoadTemplate={handleLoadTemplate}
                     />
-                  </>
+                  </div>
                 )}
               </div>
             </div>
 
             {/* Enhanced Items Table */}
-            <Card className="bg-slate-800/80 backdrop-blur-sm border-slate-700/50 shadow-2xl overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-green-600/5 to-teal-600/5"></div>
-              <CardHeader className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0 border-b border-slate-700/50 bg-slate-800/50">
-                <CardTitle className="text-green-400 text-lg sm:text-xl flex items-center">
+            <Card className="bg-slate-800/90 backdrop-blur-sm border-slate-700/50 shadow-2xl overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/5 to-teal-600/5"></div>
+              <CardHeader className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0 border-b border-slate-700/50 bg-slate-800/60">
+                <CardTitle className="text-emerald-400 text-lg sm:text-xl flex items-center">
                   <FileText className="mr-3 h-6 w-6" />
                   Itens da Solicitação
                 </CardTitle>
                 <Button 
                   onClick={addItem} 
                   size="sm" 
-                  className="bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 w-full sm:w-auto shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                  className="bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 w-full sm:w-auto shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Adicionar Item
@@ -891,7 +899,7 @@ const Index = () => {
                 <div className="hidden lg:block overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="border-b border-slate-700/50 bg-slate-700/30">
+                      <tr className="border-b border-slate-700/50 bg-slate-700/40">
                         <th className="text-left p-4 text-slate-300 text-sm font-semibold">Item</th>
                         <th className="text-left p-4 text-slate-300 text-sm font-semibold">Descrição</th>
                         <th className="text-left p-4 text-slate-300 text-sm font-semibold">Qtd</th>
@@ -902,12 +910,12 @@ const Index = () => {
                     </thead>
                     <tbody>
                       {items.map((item, index) => (
-                        <tr key={item.id} className={`border-b border-slate-700/30 hover:bg-slate-700/20 transition-colors duration-200 ${index % 2 === 0 ? 'bg-slate-800/30' : 'bg-slate-800/10'}`}>
+                        <tr key={item.id} className={`border-b border-slate-700/30 hover:bg-slate-700/30 transition-colors duration-200 ${index % 2 === 0 ? 'bg-slate-800/40' : 'bg-slate-800/20'}`}>
                           <td className="p-4">
                             <Input
                               value={item.item}
                               onChange={(e) => updateItem(item.id, 'item', e.target.value)}
-                              className="bg-slate-700/80 border-slate-600/50 text-slate-100 text-sm focus:border-green-400 focus:ring-green-400/20 transition-all duration-200"
+                              className="bg-slate-700/80 border-slate-600/50 text-slate-100 text-sm focus:border-emerald-400 focus:ring-emerald-400/20 transition-all duration-200"
                               placeholder="Item"
                             />
                           </td>
@@ -915,7 +923,7 @@ const Index = () => {
                             <Input
                               value={item.descricao}
                               onChange={(e) => updateItem(item.id, 'descricao', e.target.value)}
-                              className="bg-slate-700/80 border-slate-600/50 text-slate-100 text-sm focus:border-green-400 focus:ring-green-400/20 transition-all duration-200"
+                              className="bg-slate-700/80 border-slate-600/50 text-slate-100 text-sm focus:border-emerald-400 focus:ring-emerald-400/20 transition-all duration-200"
                               placeholder="Descrição"
                             />
                           </td>
@@ -924,7 +932,7 @@ const Index = () => {
                               type="number"
                               value={item.quantidade}
                               onChange={(e) => updateItem(item.id, 'quantidade', parseFloat(e.target.value) || 0)}
-                              className="bg-slate-700/80 border-slate-600/50 text-slate-100 text-sm w-20 focus:border-green-400 focus:ring-green-400/20 transition-all duration-200"
+                              className="bg-slate-700/80 border-slate-600/50 text-slate-100 text-sm w-20 focus:border-emerald-400 focus:ring-emerald-400/20 transition-all duration-200"
                               placeholder="0"
                             />
                           </td>
@@ -934,12 +942,12 @@ const Index = () => {
                               step="0.01"
                               value={item.valorUnitario}
                               onChange={(e) => updateItem(item.id, 'valorUnitario', parseFloat(e.target.value) || 0)}
-                              className="bg-slate-700/80 border-slate-600/50 text-slate-100 text-sm w-28 focus:border-green-400 focus:ring-green-400/20 transition-all duration-200"
+                              className="bg-slate-700/80 border-slate-600/50 text-slate-100 text-sm w-28 focus:border-emerald-400 focus:ring-emerald-400/20 transition-all duration-200"
                               placeholder="0,00"
                             />
                           </td>
                           <td className="p-4">
-                            <div className="p-3 bg-gradient-to-r from-slate-700/80 to-slate-600/80 rounded-md text-slate-100 text-right text-sm font-semibold shadow-inner">
+                            <div className="p-3 bg-gradient-to-r from-slate-700/80 to-slate-600/80 rounded-md text-slate-100 text-right text-sm font-semibold shadow-inner border border-slate-600/30">
                               R$ {item.valorTotal.toFixed(2)}
                             </div>
                           </td>
@@ -958,12 +966,12 @@ const Index = () => {
                       ))}
                     </tbody>
                     <tfoot>
-                      <tr className="border-t-2 border-slate-600 bg-gradient-to-r from-blue-900/50 to-purple-900/50">
+                      <tr className="border-t-2 border-slate-600 bg-gradient-to-r from-indigo-900/60 to-teal-900/60">
                         <td colSpan={4} className="p-4 text-right font-bold text-slate-200 text-base">
                           TOTAL GERAL:
                         </td>
                         <td className="p-4">
-                          <div className="p-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-md text-white text-right font-bold text-base shadow-lg">
+                          <div className="p-3 bg-gradient-to-r from-indigo-600 to-teal-600 rounded-md text-white text-right font-bold text-base shadow-lg border border-indigo-500/30">
                             R$ {getTotalGeral().toFixed(2)}
                           </div>
                         </td>
@@ -976,11 +984,11 @@ const Index = () => {
                 {/* Enhanced Mobile Cards */}
                 <div className="lg:hidden space-y-4 p-4">
                   {items.map((item, index) => (
-                    <Card key={item.id} className="bg-slate-700/60 backdrop-blur-sm border-slate-600/50 shadow-xl overflow-hidden">
-                      <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-purple-600/5"></div>
+                    <Card key={item.id} className="bg-slate-700/70 backdrop-blur-sm border-slate-600/50 shadow-xl overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/5 to-teal-600/5"></div>
                       <CardHeader className="relative pb-3 border-b border-slate-600/50">
                         <div className="flex items-center justify-between">
-                          <CardTitle className="text-blue-400 text-base flex items-center">
+                          <CardTitle className="text-indigo-400 text-base flex items-center">
                             <FileText className="w-4 h-4 mr-2" />
                             Item {index + 1}
                           </CardTitle>
@@ -998,25 +1006,25 @@ const Index = () => {
                       <CardContent className="relative space-y-4 p-4">
                         <div className="space-y-2">
                           <Label className="text-slate-300 text-sm flex items-center">
-                            <FileText className="w-3 h-3 mr-2 text-blue-400" />
+                            <FileText className="w-3 h-3 mr-2 text-indigo-400" />
                             Nome do Item
                           </Label>
                           <Input
                             value={item.item}
                             onChange={(e) => updateItem(item.id, 'item', e.target.value)}
-                            className="bg-slate-600/80 border-slate-500/50 text-slate-100 text-sm focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200"
+                            className="bg-slate-600/80 border-slate-500/50 text-slate-100 text-sm focus:border-indigo-400 focus:ring-indigo-400/20 transition-all duration-200"
                             placeholder="Digite o nome do item"
                           />
                         </div>
                         <div className="space-y-2">
                           <Label className="text-slate-300 text-sm flex items-center">
-                            <FileEdit className="w-3 h-3 mr-2 text-blue-400" />
+                            <FileEdit className="w-3 h-3 mr-2 text-indigo-400" />
                             Descrição
                           </Label>
                           <Input
                             value={item.descricao}
                             onChange={(e) => updateItem(item.id, 'descricao', e.target.value)}
-                            className="bg-slate-600/80 border-slate-500/50 text-slate-100 text-sm focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200"
+                            className="bg-slate-600/80 border-slate-500/50 text-slate-100 text-sm focus:border-indigo-400 focus:ring-indigo-400/20 transition-all duration-200"
                             placeholder="Digite a descrição"
                           />
                         </div>
@@ -1027,7 +1035,7 @@ const Index = () => {
                               type="number"
                               value={item.quantidade}
                               onChange={(e) => updateItem(item.id, 'quantidade', parseFloat(e.target.value) || 0)}
-                              className="bg-slate-600/80 border-slate-500/50 text-slate-100 text-sm focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200"
+                              className="bg-slate-600/80 border-slate-500/50 text-slate-100 text-sm focus:border-indigo-400 focus:ring-indigo-400/20 transition-all duration-200"
                               placeholder="0"
                             />
                           </div>
@@ -1038,15 +1046,15 @@ const Index = () => {
                               step="0.01"
                               value={item.valorUnitario}
                               onChange={(e) => updateItem(item.id, 'valorUnitario', parseFloat(e.target.value) || 0)}
-                              className="bg-slate-600/80 border-slate-500/50 text-slate-100 text-sm focus:border-blue-400 focus:ring-blue-400/20 transition-all duration-200"
+                              className="bg-slate-600/80 border-slate-500/50 text-slate-100 text-sm focus:border-indigo-400 focus:ring-indigo-400/20 transition-all duration-200"
                               placeholder="0,00"
                             />
                           </div>
                         </div>
-                        <div className="bg-gradient-to-r from-slate-600/80 to-slate-500/80 p-4 rounded-lg shadow-inner">
+                        <div className="bg-gradient-to-r from-slate-600/80 to-slate-500/80 p-4 rounded-lg shadow-inner border border-slate-500/30">
                           <div className="flex justify-between items-center">
                             <span className="text-slate-300 text-sm font-medium">Valor Total:</span>
-                            <span className="text-blue-300 font-bold text-lg">R$ {item.valorTotal.toFixed(2)}</span>
+                            <span className="text-indigo-300 font-bold text-lg">R$ {item.valorTotal.toFixed(2)}</span>
                           </div>
                         </div>
                       </CardContent>
@@ -1054,11 +1062,11 @@ const Index = () => {
                   ))}
                   
                   {/* Enhanced Total Mobile */}
-                  <Card className="bg-gradient-to-r from-blue-900/80 to-purple-900/80 backdrop-blur-sm border-blue-700/50 shadow-2xl overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-purple-600/10"></div>
-                    <CardContent className="relative p-6">
+                  <Card className="bg-gradient-to-r from-indigo-900/80 to-teal-900/80 backdrop-blur-sm border-indigo-700/50 shadow-2xl overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/10 to-teal-600/10"></div>
+                    <CardContent className="relative p-6 border border-indigo-600/20 rounded-lg">
                       <div className="flex justify-between items-center">
-                        <span className="text-blue-100 font-bold text-lg">TOTAL GERAL:</span>
+                        <span className="text-indigo-100 font-bold text-lg">TOTAL GERAL:</span>
                         <span className="text-white font-bold text-2xl drop-shadow-lg">R$ {getTotalGeral().toFixed(2)}</span>
                       </div>
                     </CardContent>
@@ -1074,27 +1082,27 @@ const Index = () => {
               <Button 
                 onClick={() => setShowPreview(false)} 
                 variant="outline"
-                className="border-slate-600 text-slate-300 hover:bg-slate-700 w-full sm:w-auto"
+                className="border-slate-600 text-slate-300 hover:bg-slate-700/50 w-full sm:w-auto hover:border-indigo-500 transition-all duration-300"
               >
                 ← Voltar ao Formulário
               </Button>
               <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
-                <Button onClick={exportToPDF} className="bg-red-600 hover:bg-red-700 text-sm">
+                <Button onClick={exportToPDF} className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-sm shadow-lg hover:shadow-xl transition-all duration-300">
                   <Download className="mr-2 h-4 w-4" />
                   PDF
                 </Button>
-                <Button onClick={exportToWord} className="bg-blue-600 hover:bg-blue-700 text-sm">
+                <Button onClick={exportToWord} className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-sm shadow-lg hover:shadow-xl transition-all duration-300">
                   <Download className="mr-2 h-4 w-4" />
                   Word
                 </Button>
-                <Button onClick={exportToExcel} className="bg-green-600 hover:bg-green-700 text-sm">
+                <Button onClick={exportToExcel} className="bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800 text-sm shadow-lg hover:shadow-xl transition-all duration-300">
                   <Download className="mr-2 h-4 w-4" />
                   Excel
                 </Button>
               </div>
             </div>
 
-            <Card className="bg-white text-black max-w-4xl mx-auto shadow-2xl" style={{ minHeight: '297mm', width: '210mm', margin: '0 auto', transform: 'scale(0.85)' }}>
+            <Card className="bg-white text-black max-w-4xl mx-auto shadow-2xl border-2 border-slate-300" style={{ minHeight: '297mm', width: '210mm', margin: '0 auto', transform: 'scale(0.85)' }}>
               <CardContent className="p-4 sm:p-6 lg:p-8" style={{ fontSize: `${fontSize}px` }}>
                 {/* Cabeçalho do documento responsivo */}
                 <div className="text-center mb-6 sm:mb-8">
@@ -1125,14 +1133,14 @@ const Index = () => {
                 <div className="mb-4 sm:mb-6">
                   {/* Tabela desktop */}
                   <div className="hidden sm:block overflow-x-auto">
-                    <table className="w-full border-collapse border border-black" style={{ fontSize: `${fontSize - 2}px` }}>
+                    <table className="w-full border-collapse border-2 border-black" style={{ fontSize: `${fontSize - 2}px` }}>
                       <thead>
                         <tr className="bg-gray-200">
-                          <th className="border border-black p-1 sm:p-2 text-left">ITEM</th>
-                          <th className="border border-black p-1 sm:p-2 text-left">DESCRIÇÃO</th>
-                          <th className="border border-black p-1 sm:p-2 text-center">QTD</th>
-                          <th className="border border-black p-1 sm:p-2 text-right">VALOR UNIT.</th>
-                          <th className="border border-black p-1 sm:p-2 text-right">VALOR TOTAL</th>
+                          <th className="border-2 border-black p-1 sm:p-2 text-left">ITEM</th>
+                          <th className="border-2 border-black p-1 sm:p-2 text-left">DESCRIÇÃO</th>
+                          <th className="border-2 border-black p-1 sm:p-2 text-center">QTD</th>
+                          <th className="border-2 border-black p-1 sm:p-2 text-right">VALOR UNIT.</th>
+                          <th className="border-2 border-black p-1 sm:p-2 text-right">VALOR TOTAL</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1145,9 +1153,9 @@ const Index = () => {
                             <td className="border border-black p-1 sm:p-2 text-right">R$ {item.valorTotal.toFixed(2)}</td>
                           </tr>
                         ))}
-                        <tr className="bg-gray-100 font-bold">
-                          <td className="border border-black p-1 sm:p-2" colSpan={4}>TOTAL GERAL:</td>
-                          <td className="border border-black p-1 sm:p-2 text-right">R$ {getTotalGeral().toFixed(2)}</td>
+                        <tr className="bg-gray-200 font-bold">
+                          <td className="border-2 border-black p-1 sm:p-2" colSpan={4}>TOTAL GERAL:</td>
+                          <td className="border-2 border-black p-1 sm:p-2 text-right">R$ {getTotalGeral().toFixed(2)}</td>
                         </tr>
                       </tbody>
                     </table>
@@ -1156,7 +1164,7 @@ const Index = () => {
                   {/* Cards mobile */}
                   <div className="sm:hidden space-y-3">
                     {items.map((item, index) => (
-                      <div key={item.id} className="border border-gray-300 p-3 rounded bg-gray-50">
+                      <div key={item.id} className="border-2 border-gray-400 p-3 rounded bg-gray-50">
                         <div className="space-y-2" style={{ fontSize: `${fontSize - 2}px` }}>
                           <div><strong>Item {index + 1}:</strong> {item.item}</div>
                           <div><strong>Descrição:</strong> {item.descricao}</div>
@@ -1164,13 +1172,13 @@ const Index = () => {
                             <div><strong>Qtd:</strong> {item.quantidade}</div>
                             <div><strong>Unit.:</strong> R$ {item.valorUnitario.toFixed(2)}</div>
                           </div>
-                          <div className="bg-gray-200 p-2 rounded">
+                          <div className="bg-gray-300 p-2 rounded border">
                             <strong>Total: R$ {item.valorTotal.toFixed(2)}</strong>
                           </div>
                         </div>
                       </div>
                     ))}
-                    <div className="border-2 border-gray-800 p-3 rounded bg-gray-200">
+                    <div className="border-4 border-gray-800 p-4 rounded bg-gray-200">
                       <div className="text-center font-bold" style={{ fontSize: `${fontSize}px` }}>
                         TOTAL GERAL: R$ {getTotalGeral().toFixed(2)}
                       </div>
@@ -1182,15 +1190,15 @@ const Index = () => {
                 {formData.observacoes && (
                   <div className="mb-6 sm:mb-8">
                     <h3 className="font-bold mb-2">OBSERVAÇÕES:</h3>
-                    <p className="text-justify break-words">{formData.observacoes}</p>
+                    <p className="text-justify break-words border border-gray-300 p-3 bg-gray-50 rounded">{formData.observacoes}</p>
                   </div>
                 )}
 
                 {/* Espaço para assinatura */}
                 <div className="mt-12 sm:mt-16 text-center">
-                  <div className="border-b border-black w-60 sm:w-80 mx-auto mb-2"></div>
-                  <p>Assinatura do Solicitante</p>
-                  <p className="mt-6 sm:mt-8">Inajá - PR, {format(new Date(), 'dd/MM/yyyy', { locale: ptBR })}</p>
+                  <div className="border-b-2 border-black w-60 sm:w-80 mx-auto mb-2"></div>
+                  <p className="font-semibold">Assinatura do Solicitante</p>
+                  <p className="mt-6 sm:mt-8 font-medium">Inajá - PR, {format(new Date(), 'dd/MM/yyyy', { locale: ptBR })}</p>
                 </div>
               </CardContent>
             </Card>
@@ -1199,10 +1207,10 @@ const Index = () => {
 
         {/* Developer Credit */}
         <div className="mt-12 text-center">
-          <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-slate-800/80 to-slate-700/80 backdrop-blur-sm border border-slate-600/50 rounded-full shadow-lg">
+          <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-slate-800/90 to-slate-700/90 backdrop-blur-sm border border-slate-600/50 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
             <span className="text-slate-400 text-sm">
               Desenvolvido por{" "}
-              <span className="text-transparent bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text font-semibold">
+              <span className="text-transparent bg-gradient-to-r from-indigo-400 via-cyan-400 to-teal-400 bg-clip-text font-semibold">
                 ALEKSANDRO ALVES
               </span>
             </span>
