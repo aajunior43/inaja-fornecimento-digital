@@ -17,7 +17,9 @@ import { saveAs } from 'file-saver';
 import { FontSizeControl } from "@/components/FontSizeControl";
 import { TemplateManager } from "@/components/TemplateManager";
 import { DataManager } from "@/components/DataManager";
+import { BatchRequestManager } from "@/components/BatchRequestManager";
 import { TemplateData } from "@/hooks/useTemplates";
+import { useBatchRequest } from "@/hooks/useBatchRequest";
 
 interface Item {
   id: string;
@@ -59,6 +61,15 @@ const Index = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [fontSize, setFontSize] = useState(12);
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
+  const [showBatchManager, setShowBatchManager] = useState(false);
+  
+  const { 
+    processedRequests, 
+    processBatchRequests, 
+    exportBatchToJSON, 
+    clearProcessedRequests, 
+    getRequestSummary 
+  } = useBatchRequest();
 
   const addItem = () => {
     const newItem: Item = {
@@ -123,6 +134,20 @@ const Index = () => {
       title: "Modelo carregado",
       description: `O modelo "${template.name}" foi aplicado com sucesso!`,
     });
+  };
+
+  const handleBatchProcess = (batchRequests: Array<{
+    solicitante: string;
+    empresa: string;
+    observacoes: string;
+    items: Array<{
+      item: string;
+      descricao: string;
+      quantidade: number;
+      valorUnitario: number;
+    }>;
+  }>) => {
+    processBatchRequests(batchRequests);
   };
 
   const exportToPDF = () => {
@@ -702,7 +727,7 @@ const Index = () => {
                 </p>
               </div>
             </div>
-            <div className="flex justify-center">
+            <div className="flex flex-col sm:flex-row justify-center gap-2">
               <Button
                 onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}
                 variant="outline"
@@ -711,6 +736,15 @@ const Index = () => {
               >
                 <Settings className="mr-2 h-4 w-4" />
                 Opções Avançadas
+              </Button>
+              <Button
+                onClick={() => setShowBatchManager(!showBatchManager)}
+                variant="outline"
+                size="sm"
+                className="border-orange-600 text-orange-300 hover:bg-orange-700/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:border-orange-400"
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                Solicitação em Lote
               </Button>
             </div>
           </div>
@@ -872,6 +906,75 @@ const Index = () => {
                       items={items}
                       onLoadTemplate={handleLoadTemplate}
                     />
+                  </div>
+                )}
+
+                {/* Batch Request Manager */}
+                {showBatchManager && (
+                  <div className="grid grid-cols-1 gap-4">
+                    <BatchRequestManager onProcessBatch={handleBatchProcess} />
+                    
+                    {processedRequests.length > 0 && (
+                      <Card className="bg-slate-800/90 backdrop-blur-sm border-slate-700/50">
+                        <CardHeader>
+                          <CardTitle className="text-orange-400 flex items-center">
+                            <FileText className="mr-2 h-5 w-5" />
+                            Solicitações Processadas ({processedRequests.length})
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                            <div className="bg-slate-700/50 p-3 rounded-lg">
+                              <div className="text-2xl font-bold text-orange-400">{getRequestSummary().totalRequests}</div>
+                              <div className="text-sm text-slate-300">Solicitações</div>
+                            </div>
+                            <div className="bg-slate-700/50 p-3 rounded-lg">
+                              <div className="text-2xl font-bold text-green-400">R$ {getRequestSummary().totalValue.toFixed(2)}</div>
+                              <div className="text-sm text-slate-300">Valor Total</div>
+                            </div>
+                            <div className="bg-slate-700/50 p-3 rounded-lg">
+                              <div className="text-2xl font-bold text-blue-400">{getRequestSummary().uniqueSolicitantes}</div>
+                              <div className="text-sm text-slate-300">Solicitantes</div>
+                            </div>
+                            <div className="bg-slate-700/50 p-3 rounded-lg">
+                              <div className="text-2xl font-bold text-purple-400">{getRequestSummary().uniqueEmpresas}</div>
+                              <div className="text-sm text-slate-300">Empresas</div>
+                            </div>
+                          </div>
+                          
+                          <div className="flex flex-col sm:flex-row gap-2">
+                            <Button 
+                              onClick={exportBatchToJSON}
+                              className="bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800"
+                            >
+                              <Download className="mr-2 h-4 w-4" />
+                              Exportar Lote JSON
+                            </Button>
+                            <Button 
+                              onClick={clearProcessedRequests}
+                              variant="destructive"
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Limpar Lote
+                            </Button>
+                          </div>
+                          
+                          <div className="max-h-40 overflow-y-auto space-y-2">
+                            {processedRequests.map((request) => (
+                              <div key={request.id} className="bg-slate-700/30 p-3 rounded border-l-4 border-orange-400">
+                                <div className="flex justify-between items-start">
+                                  <div>
+                                    <div className="font-medium text-slate-200">{request.solicitante} - {request.empresa}</div>
+                                    <div className="text-sm text-slate-400">{request.items.length} itens - R$ {request.valorTotal.toFixed(2)}</div>
+                                  </div>
+                                  <div className="text-xs text-slate-500">{request.dataSolicitacao}</div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
                   </div>
                 )}
               </div>
