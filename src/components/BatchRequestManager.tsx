@@ -68,6 +68,101 @@ Pedro Oliveira|Loja de Materiais|Ferramentas|Martelo:Martelo cabo madeira:1:35.0
     });
   };
 
+  const downloadAIInstructions = () => {
+    const aiInstructionsContent = `# INSTRUÇÕES PARA IA - GERAÇÃO DE ARQUIVO DE SOLICITAÇÕES EM LOTE
+
+## CONTEXTO
+Você é uma IA especializada em ajudar a criar arquivos TXT para o sistema de solicitações em lote da Prefeitura Municipal de Inajá. Sua função é converter solicitações de compras/serviços em formato estruturado.
+
+## FORMATO OBRIGATÓRIO
+Cada linha representa uma solicitação no formato:
+SOLICITANTE|EMPRESA|OBSERVACOES|ITEM1:DESCRICAO1:QTD1:VALOR1;ITEM2:DESCRICAO2:QTD2:VALOR2
+
+## REGRAS IMPORTANTES
+1. Use exatamente 4 campos separados por | (pipe)
+2. Campos obrigatórios: SOLICITANTE e EMPRESA
+3. OBSERVACOES pode ser vazio mas o campo deve existir
+4. Itens são separados por ; (ponto e vírgula)
+5. Detalhes do item são separados por : (dois pontos)
+6. Ordem do item: NOME:DESCRIÇÃO:QUANTIDADE:VALOR_UNITÁRIO
+7. Use ponto para decimais (25.50, não 25,50)
+8. Não use acentos nos nomes dos arquivos
+9. Linhas iniciadas com # são comentários
+
+## EXEMPLO DE CONVERSAÇÃO
+
+**Usuário:** "Preciso de uma solicitação para o João Silva da Secretaria de Obras comprar 10 sacos de cimento a R$ 35,00 cada e 5 metros de ferro a R$ 12,50 o metro para construção de calçada"
+
+**Sua resposta:**
+\`\`\`
+João Silva|Secretaria de Obras|Materiais para construção de calçada|Saco de Cimento:Cimento CP-II 50kg:10:35.00;Ferro para Construção:Ferro 8mm por metro:5:12.50
+\`\`\`
+
+## PADRÕES PARA DIFERENTES TIPOS DE SOLICITAÇÃO
+
+### Materiais de Construção
+Nome do Item:Descrição técnica detalhada:Quantidade:Valor
+
+### Material de Escritório  
+Nome do Item:Especificação do produto:Quantidade:Valor
+
+### Serviços
+Nome do Serviço:Descrição completa do serviço:Quantidade/Horas:Valor
+
+### Equipamentos
+Nome do Equipamento:Modelo e especificações:Quantidade:Valor
+
+## DICAS PARA VALORES
+- Sempre use ponto para separar decimais
+- Se o usuário informar com vírgula, converta para ponto
+- Se não informar centavos, adicione .00
+- Valores devem ser realistas para o mercado atual
+
+## TRATAMENTO DE DADOS INCOMPLETOS
+- Se faltar informação, peça esclarecimento
+- Sugira valores aproximados quando necessário
+- Sempre confirme antes de gerar a linha final
+
+## VALIDAÇÃO ANTES DE ENTREGAR
+Antes de enviar sua resposta, verifique:
+✓ Exatamente 4 campos separados por |
+✓ Pelo menos 1 item no formato correto
+✓ Valores com ponto decimal
+✓ Nomes sem caracteres especiais problemáticos
+
+## EXEMPLO COMPLETO DE MÚLTIPLAS SOLICITAÇÕES
+
+\`\`\`
+# Solicitações da Secretaria de Obras - Janeiro 2024
+José Santos|Secretaria de Obras|Material para reforma da escola|Tinta Latex:Tinta branca 18L:5:45.00;Rolo de Pintura:Rolo espuma 23cm:10:8.50
+Maria Oliveira|Secretaria de Saúde|Equipamentos para posto de saúde|Termômetro Digital:Termômetro infravermelho:3:89.00;Álcool Gel:Álcool gel 70% 500ml:20:12.00
+Pedro Silva|Secretaria de Educação|Material escolar|Papel A4:Papel sulfite 500 folhas:50:25.00;Caneta Azul:Caneta esferográfica azul:100:1.50
+\`\`\`
+
+## RESPOSTA PADRÃO
+Sempre forneça:
+1. O texto formatado entre \`\`\`
+2. Confirmação dos dados interpretados
+3. Sugestão de revisão se necessário
+
+Agora você está pronto para ajudar na criação de arquivos de solicitação em lote!`;
+
+    const blob = new Blob([aiInstructionsContent], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'instrucoes_IA_solicitacao_lote.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Instruções para IA baixadas",
+      description: "O arquivo de instruções para IA foi baixado com sucesso!",
+    });
+  };
+
   const parseTextFile = (content: string): Array<{ line: number; error: string; data?: BatchRequest }> => {
     const lines = content.split('\n');
     const results: Array<{ line: number; error: string; data?: BatchRequest }> = [];
@@ -285,16 +380,28 @@ Pedro Oliveira|Loja de Materiais|Ferramentas|Martelo:Martelo cabo madeira:1:35.0
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <Label htmlFor="template-download">1. Baixar Modelo</Label>
+            <Label htmlFor="template-download">1. Baixar Modelo Manual</Label>
             <Button 
               onClick={downloadTemplate}
               variant="outline" 
               className="w-full mt-2"
             >
               <Download className="h-4 w-4 mr-2" />
-              Baixar Modelo TXT
+              Modelo TXT
+            </Button>
+          </div>
+
+          <div>
+            <Label htmlFor="ai-instructions">1b. Baixar Instruções para IA</Label>
+            <Button 
+              onClick={downloadAIInstructions}
+              variant="outline" 
+              className="w-full mt-2 border-purple-600 text-purple-600 hover:bg-purple-50"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Instruções IA
             </Button>
           </div>
 
