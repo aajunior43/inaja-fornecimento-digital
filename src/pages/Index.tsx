@@ -359,6 +359,226 @@ const Index = () => {
     });
   };
 
+  const exportBatchToPDF = () => {
+    if (processedRequests.length === 0) {
+      toast({
+        title: "Nenhuma solicitação",
+        description: "Não há solicitações processadas para exportar.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const doc = new jsPDF();
+    
+    // Cores mais sóbrias e profissionais
+    const primaryColor = [52, 73, 94]; // Azul escuro
+    const lightGray = [245, 245, 245];
+    const darkGray = [44, 62, 80];
+    
+    // Função para converter imagem para base64
+    const addImageToPDF = (imageSrc: string) => {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx?.drawImage(img, 0, 0);
+          const dataURL = canvas.toDataURL('image/png');
+          resolve(dataURL);
+        };
+        img.onerror = function() {
+          resolve(null);
+        };
+        img.src = imageSrc;
+      });
+    };
+
+    // Processar cada solicitação
+    addImageToPDF('/lovable-uploads/007f16c7-9a20-4239-954a-386da9c3b0b4.png').then((logoBase64: any) => {
+      processedRequests.forEach((request, requestIndex) => {
+        if (requestIndex > 0) {
+          doc.addPage();
+        }
+
+        // Linha decorativa no topo
+        doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.rect(0, 0, 210, 5, 'F');
+        
+        if (logoBase64) {
+          doc.addImage(logoBase64, 'PNG', 15, 15, 25, 25);
+        }
+        
+        // Cabeçalho
+        doc.setFontSize(16);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.text("PREFEITURA MUNICIPAL DE INAJÁ", 105, 25, { align: "center" });
+        
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
+        doc.text("Av. Antônio Veiga Martins, 80 - CEP: 87670-000", 105, 35, { align: "center" });
+        doc.text("Telefone: (44) 3112-4320 | E-mail: prefeito@inaja.pr.gov.br", 105, 42, { align: "center" });
+        
+        // Linha separadora
+        doc.setDrawColor(150, 150, 150);
+        doc.setLineWidth(0.5);
+        doc.line(20, 48, 190, 48);
+        
+        // Título do documento
+        doc.setFontSize(fontSize + 2);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.text("SOLICITAÇÃO DE AQUISIÇÃO DE PRODUTOS OU SERVIÇOS", 105, 60, { align: "center" });
+        
+        // Dados do formulário
+        doc.setFontSize(fontSize - 2);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(0, 0, 0);
+        
+        // Caixa de informações
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.5);
+        doc.rect(20, 75, 170, 25, 'S');
+        
+        doc.setFont("helvetica", "bold");
+        doc.text("Solicitante:", 25, 83);
+        doc.setFont("helvetica", "normal");
+        doc.text(request.solicitante, 55, 83);
+        
+        doc.setFont("helvetica", "bold");
+        doc.text("Empresa:", 25, 90);
+        doc.setFont("helvetica", "normal");
+        doc.text(request.empresa, 50, 90);
+        
+        doc.setFont("helvetica", "bold");
+        doc.text("Data:", 25, 97);
+        doc.setFont("helvetica", "normal");
+        doc.text(request.dataSolicitacao, 40, 97);
+        
+        // Tabela de itens
+        let yPosition = 115;
+        
+        // Cabeçalho da tabela
+        doc.setFillColor(lightGray[0], lightGray[1], lightGray[2]);
+        doc.rect(20, yPosition, 170, 10, 'F');
+        
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(fontSize - 3);
+        doc.setTextColor(0, 0, 0);
+        
+        // Desenhar bordas do cabeçalho
+        doc.setDrawColor(0, 0, 0);
+        doc.setLineWidth(0.5);
+        doc.rect(20, yPosition, 25, 10);
+        doc.rect(45, yPosition, 70, 10);
+        doc.rect(115, yPosition, 20, 10);
+        doc.rect(135, yPosition, 27, 10);
+        doc.rect(162, yPosition, 28, 10);
+        
+        // Texto do cabeçalho
+        doc.text("ITEM", 32, yPosition + 6, { align: "center" });
+        doc.text("DESCRIÇÃO", 80, yPosition + 6, { align: "center" });
+        doc.text("QTD", 125, yPosition + 6, { align: "center" });
+        doc.text("VALOR UNIT.", 148, yPosition + 6, { align: "center" });
+        doc.text("VALOR TOTAL", 176, yPosition + 6, { align: "center" });
+        
+        yPosition += 10;
+        
+        // Itens da tabela
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(0, 0, 0);
+        doc.setDrawColor(0, 0, 0);
+        doc.setFontSize(fontSize - 4);
+        
+        request.items.forEach((item) => {
+          if (yPosition > 250) {
+            doc.addPage();
+            yPosition = 20;
+          }
+          
+          const rowHeight = 8;
+          const valorTotal = item.quantidade * item.valorUnitario;
+          
+          // Desenhar bordas das células
+          doc.rect(20, yPosition, 25, rowHeight);
+          doc.rect(45, yPosition, 70, rowHeight);
+          doc.rect(115, yPosition, 20, rowHeight);
+          doc.rect(135, yPosition, 27, rowHeight);
+          doc.rect(162, yPosition, 28, rowHeight);
+          
+          // Texto das células
+          const textY = yPosition + (rowHeight / 2) + 1.5;
+          doc.text(item.item.substring(0, 20), 22, textY);
+          doc.text(item.descricao.substring(0, 45), 47, textY);
+          doc.text(item.quantidade.toString(), 125, textY, { align: "center" });
+          doc.text(`R$ ${item.valorUnitario.toFixed(2)}`, 148, textY, { align: "center" });
+          doc.text(`R$ ${valorTotal.toFixed(2)}`, 176, textY, { align: "center" });
+          yPosition += rowHeight;
+        });
+        
+        // Total geral
+        const totalRowHeight = 8;
+        doc.setFillColor(220, 220, 220);
+        doc.rect(20, yPosition, 142, totalRowHeight, 'F');
+        doc.rect(162, yPosition, 28, totalRowHeight, 'F');
+        
+        doc.setDrawColor(0, 0, 0);
+        doc.rect(20, yPosition, 142, totalRowHeight, 'S');
+        doc.rect(162, yPosition, 28, totalRowHeight, 'S');
+        
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(0, 0, 0);
+        const totalTextY = yPosition + (totalRowHeight / 2) + 1.5;
+        doc.text("TOTAL GERAL:", 148, totalTextY, { align: "center" });
+        doc.text(`R$ ${request.valorTotal.toFixed(2)}`, 176, totalTextY, { align: "center" });
+        
+        yPosition += totalRowHeight + 15;
+        
+        // Observações
+        if (request.observacoes) {
+          doc.setDrawColor(200, 200, 200);
+          doc.setTextColor(0, 0, 0);
+          doc.setFontSize(fontSize - 2);
+          
+          const observHeight = Math.max(20, doc.splitTextToSize(request.observacoes, 160).length * 5 + 10);
+          doc.rect(20, yPosition, 170, observHeight, 'S');
+          
+          doc.setFont("helvetica", "bold");
+          doc.text("OBSERVAÇÕES:", 25, yPosition + 8);
+          yPosition += 15;
+          doc.setFont("helvetica", "normal");
+          const splitText = doc.splitTextToSize(request.observacoes, 160);
+          doc.text(splitText, 25, yPosition);
+          yPosition += observHeight;
+        }
+        
+        // Assinatura
+        yPosition += 30;
+        doc.setDrawColor(0, 0, 0);
+        doc.setLineWidth(1);
+        doc.line(60, yPosition, 150, yPosition);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(fontSize - 2);
+        doc.text("Assinatura do Solicitante", 105, yPosition + 8, { align: "center" });
+        
+        yPosition += 25;
+        doc.text(`Inajá - PR, ${request.dataSolicitacao}`, 105, yPosition, { align: "center" });
+      });
+
+      doc.save(`Lote_Solicitacoes_${format(new Date(), 'ddMMyyyy')}.pdf`);
+      
+      toast({
+        title: "PDF do lote exportado",
+        description: `${processedRequests.length} solicitações foram exportadas para PDF!`,
+      });
+    });
+  };
+
   const exportToWord = async () => {
     try {
       // Função para converter imagem para buffer
@@ -943,6 +1163,13 @@ const Index = () => {
                           </div>
                           
                           <div className="flex flex-col sm:flex-row gap-2">
+                            <Button 
+                              onClick={exportBatchToPDF}
+                              className="bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800"
+                            >
+                              <Download className="mr-2 h-4 w-4" />
+                              Gerar Lote PDF
+                            </Button>
                             <Button 
                               onClick={exportBatchToJSON}
                               className="bg-gradient-to-r from-green-600 to-emerald-700 hover:from-green-700 hover:to-emerald-800"
